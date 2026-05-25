@@ -21,6 +21,12 @@ public class JetSkiController : MonoBehaviour
     // 롤링 안정화 강도. 높을수록 빠르게 수평 유지
     public float rollStrength = 1f;
 
+    [Header("착지 댐핑")]
+    [Tooltip("착지 직후 반동 억제 시간(초). 클수록 착지가 부드러워짐. 보통 0.15~0.3.")]
+    public float landingDampDuration = 0.2f;
+    [Tooltip("착지 감지 최소 하강 속도(m/s). 이보다 빠르게 입수해야 착지 댐핑 발동.")]
+    public float landingVelThreshold = 2.5f;
+
     [Header("이동")]
 
     //
@@ -47,6 +53,8 @@ public class JetSkiController : MonoBehaviour
     public JetSkiBoost boost;
 
     private Rigidbody rb;
+    private float landingDampTimer;
+    private bool wasSubmerged;
 
     // 4코너 샘플 포인트 (로컬 스페이스)
     private static readonly Vector3[] sampleOffsets =
@@ -92,6 +100,8 @@ public class JetSkiController : MonoBehaviour
         Vector3 avgNormal = Vector3.zero;
         int submergedCount = 0;
 
+        bool isLandingDamp = landingDampTimer > 0f;
+
         foreach (var offset in sampleOffsets)
         {
             Vector3 worldPoint = transform.TransformPoint(offset);
@@ -101,14 +111,22 @@ public class JetSkiController : MonoBehaviour
             if (depth <= 0f) continue;
 
             float velY = rb.GetPointVelocity(worldPoint).y;
-            // 비대칭 댐핑: 하강은 풀, 상승은 약하게. 0이면 탱탱볼, 1이면 점프 안 됨.
-            float dampMul = velY < 0f ? 1f : ascentDampingMul;
+            // 비대칭 댐핑: 하강 또는 착지 직후엔 풀 댐핑, 파도 상승 시엔 약하게(크레스트 분리용)
+            float dampMul = (velY < 0f || isLandingDamp) ? 1f : ascentDampingMul;
             float force = depth * buoyancyForce - velY * buoyancyDamping * dampMul;
             rb.AddForceAtPosition(Vector3.up * force, worldPoint, ForceMode.Force);
 
             avgNormal += normal;
             submergedCount++;
         }
+
+        // 착지 감지: 공중 → 입수 + 빠른 하강 속도
+        bool nowSubmerged = submergedCount > 0;
+        if (!wasSubmerged && nowSubmerged && rb.velocity.y < -landingVelThreshold)
+            landingDampTimer = landingDampDuration;
+        else
+            landingDampTimer = Mathf.Max(0f, landingDampTimer - Time.fixedDeltaTime);
+        wasSubmerged = nowSubmerged;
 
         // 파도 경사면 슬로프 어시스트: 수면 노멀의 수평 성분을 따라 앞으로 밀어줌
         if (submergedCount > 0 && waveSlopeAssist > 0f)
