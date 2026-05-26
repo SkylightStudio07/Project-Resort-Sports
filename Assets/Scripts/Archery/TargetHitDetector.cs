@@ -6,6 +6,8 @@ public class TargetHitDetector : MonoBehaviour
     [SerializeField]
     private ArcheryGameManager gameManager;
     [SerializeField]
+    private ArcheryUI ui;
+    [SerializeField]
     private float targetRadius = 0.5f;
 
     public void RegisterHit(Vector3 hitWorldPos)
@@ -18,6 +20,7 @@ public class TargetHitDetector : MonoBehaviour
         if (score > 0)
         {
             gameManager.AddScore(score);
+            ui.ShowScorePopup(score, hitWorldPos);
             Debug.Log($"Hit! +{score}");
         }
     }
