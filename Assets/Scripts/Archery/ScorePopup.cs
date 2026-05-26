@@ -28,7 +28,7 @@ public class ScorePopup : MonoBehaviour
 
         if (Camera.main != null)
         {
-            transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position);
+            transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - transform.position);
         }
 
         float alpha = Mathf.Lerp(1f, 0f, elapsed / lifetime);

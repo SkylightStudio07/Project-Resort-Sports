@@ -4,15 +4,19 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class BowController : MonoBehaviour
 {
-    [Header("레퍼런스")]
+    [Header("Settings")]
     [SerializeField]
     private Transform nockingPoint;
     [SerializeField]
-    private Transform stringTopPoint;
+    private Transform wbStringBone;
     [SerializeField]
-    private Transform stringBottomPoint;
+    private float pullOffset = 0.05f;
+
+    [Header("Camera Attach Settings")]
     [SerializeField]
-    private LineRenderer stringRenderer;
+    private Vector3 attachOffset = new Vector3(0.3f, -0.3f, 0.5f);
+    [SerializeField]
+    private Vector3 attachRotation = new Vector3(0f, 0f, 0f);
 
     [HideInInspector]
     public bool isHeld = false;
@@ -20,38 +24,64 @@ public class BowController : MonoBehaviour
     public PullInteraction activePull = null;
 
     private XRGrabInteractable grabInteractable;
+    private Rigidbody rb;
+    private Vector3 defaultStringPos;
+    private bool isAttached = false;
 
     public Transform NockingPoint => nockingPoint;
 
     private void Awake()
     {
+        rb = GetComponent<Rigidbody>();
         grabInteractable = GetComponent<XRGrabInteractable>();
         grabInteractable.selectEntered.AddListener(OnGrabbed);
         grabInteractable.selectExited.AddListener(OnReleased);
 
-        UpdateString(nockingPoint.position);
+        if (wbStringBone != null)
+        {
+            defaultStringPos = wbStringBone.localPosition;
+        }
+        UpdateString(0f);
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
+        if (isAttached)
+        {
+            return;
+        }
+
         isHeld = true;
+        isAttached = true;
+
+        rb.isKinematic = true;
+        transform.SetParent(Camera.main.transform);
+        transform.localPosition = attachOffset;
+        transform.localRotation = Quaternion.Euler(attachRotation);
+
+        grabInteractable.enabled = false;
     }
 
     private void OnReleased(SelectExitEventArgs args)
     {
-        isHeld = false;
-        if (activePull != null)
-            activePull.CancelPull();
-    }
-
-    public void UpdateString(Vector3 pullPos)
-    {
-        if (stringRenderer == null)
+        if (isAttached)
         {
             return;
         }
-        stringRenderer.SetPosition(0, stringTopPoint.position);
-        stringRenderer.SetPosition(1, pullPos);
-        stringRenderer.SetPosition(2, stringBottomPoint.position);
+
+        isHeld = false;
+        if (activePull != null)
+        {
+            activePull.CancelPull();
+        }
+    }
+
+    public void UpdateString(float pullAmount)
+    {
+        if (wbStringBone == null)
+        {
+            return;
+        }
+        wbStringBone.localPosition = defaultStringPos + new Vector3(0f, 0f, pullAmount * pullOffset);
     }
 }

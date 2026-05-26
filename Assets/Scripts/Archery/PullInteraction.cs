@@ -19,7 +19,7 @@ public class PullInteraction : MonoBehaviour
     {
         bow = GetComponentInParent<BowController>();
         interactable = GetComponent<XRGrabInteractable>();
-        arrowSpawner = GetComponentInParent<ArrowSpawner>();sm
+        arrowSpawner = GetComponentInParent<ArrowSpawner>();
         interactable.selectEntered.AddListener(OnStartPull);
         interactable.selectExited.AddListener(OnStopPull);
     }
@@ -56,7 +56,7 @@ public class PullInteraction : MonoBehaviour
         pullAmount = 0f;
         pullingHand = null;
         bow.activePull = null;
-        bow.UpdateString(bow.NockingPoint.position);
+        bow.UpdateString(0f);
     }
 
     private void Update()
@@ -68,6 +68,6 @@ public class PullInteraction : MonoBehaviour
 
         float distance = Vector3.Distance(pullingHand.position, bow.NockingPoint.position);
         pullAmount = Mathf.Clamp01(distance / maxPullDistance);
-        bow.UpdateString(pullingHand.position);
+        bow.UpdateString(pullAmount);
     }
 }

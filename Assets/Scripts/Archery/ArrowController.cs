@@ -28,16 +28,16 @@ public class ArrowController : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(rb.velocity);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
         if (!fired) return;
 
-        TargetHitDetector target = other.GetComponent<TargetHitDetector>();
+        TargetHitDetector target = collision.gameObject.GetComponent<TargetHitDetector>();
 
         if (target != null)
         {
             target.RegisterHit(transform.position);
-            StickTo(other.transform);
+            StickTo(collision.transform);
             return;
         }
 
