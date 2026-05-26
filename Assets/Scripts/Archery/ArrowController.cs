@@ -32,11 +32,11 @@ public class ArrowController : MonoBehaviour
     {
         if (!fired) return;
 
-        ScoreZone zone = other.GetComponent<ScoreZone>();
+        TargetHitDetector target = other.GetComponent<TargetHitDetector>();
 
-        if (zone != null)
+        if (target != null)
         {
-            zone.RegisterHit(this);
+            target.RegisterHit(transform.position);
             StickTo(other.transform);
             return;
         }
