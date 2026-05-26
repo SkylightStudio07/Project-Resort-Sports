@@ -101,22 +101,4 @@ public class JetSkiScoreManager : MonoBehaviour
         Debug.Log($"[ScoreManager] 종료 — 점수: {Score}, 랭크: {rank}");
         onGameOver?.Invoke(Score, rank);
     }
-
-    // ── 이벤트 연결 없이도 동작 확인용 OnGUI HUD ──────────────────
-    void OnGUI()
-    {
-        if (!IsRunning && Score == 0) return;
-
-        var style = new GUIStyle(GUI.skin.box)
-        {
-            fontSize  = 24,
-            alignment = TextAnchor.MiddleLeft,
-        };
-        style.normal.textColor = Color.white;
-
-        string status = IsRunning ? $"⏱ {RemainingTime:F1}s" : "FINISH";
-        string text   = $" {status}\n 점수: {Score}\n 콤보: x{Combo}";
-
-        GUI.Box(new Rect(20, 20, 220, 100), text, style);
-    }
 }
