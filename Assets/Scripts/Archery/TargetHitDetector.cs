@@ -16,6 +16,8 @@ public class TargetHitDetector : MonoBehaviour
         float distance = new Vector2(localHit.x, localHit.y).magnitude;
         float ratio = distance / targetRadius;
 
+        Debug.Log($"[Target] localDist={distance:F3}, ratio={ratio:F2}, targetRadius={targetRadius}");
+
         int score = CalculateScore(ratio);
         if (score > 0)
         {
