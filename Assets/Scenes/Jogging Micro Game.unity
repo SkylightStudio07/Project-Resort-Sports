@@ -490,6 +490,36 @@ MonoBehaviour:
   waypoints:
   - localPosition: {x: 0, y: 0, z: 0}
     label: 
+  - localPosition: {x: -14.319344, y: 0, z: 19.403275}
+    label: 
+  - localPosition: {x: -38.737015, y: 1.6937447, z: 72.86659}
+    label: 
+  - localPosition: {x: -21.610565, y: 2.1638265, z: 125.34456}
+    label: 
+  - localPosition: {x: -3.534523, y: 0.22088146, z: 143.28133}
+    label: 
+  - localPosition: {x: 12.926582, y: 0.22088146, z: 163.38028}
+    label: 
+  - localPosition: {x: 15.914261, y: 0.22088146, z: 173.80379}
+    label: 
+  - localPosition: {x: 30.092575, y: 0.22088146, z: 183.0968}
+    label: 
+  - localPosition: {x: 54.749756, y: 0.22088146, z: 184.23271}
+    label: 
+  - localPosition: {x: 87.63294, y: 0.22088146, z: 189.23271}
+    label: 
+  - localPosition: {x: 118.677536, y: 0.22088146, z: 175.30417}
+    label: 
+  - localPosition: {x: 139.9757, y: 0.22088146, z: 152.12054}
+    label: 
+  - localPosition: {x: 157.35626, y: 0.22088146, z: 124.887085}
+    label: 
+  - localPosition: {x: 155.7803, y: 0.22088146, z: 71.0887}
+    label: 
+  - localPosition: {x: 119.56732, y: 0.22088146, z: 16.618004}
+    label: 
+  - localPosition: {x: 60.149826, y: 0.22088146, z: -14.103302}
+    label: 
   loop: 1
   smooth: 1
   sampleCount: 130
@@ -505,7 +535,7 @@ Transform:
   m_GameObject: {fileID: 318833788}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.319373, y: -4.5683947, z: -5.6408434}
+  m_LocalPosition: {x: -86.3, y: -4.5683947, z: -82.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
