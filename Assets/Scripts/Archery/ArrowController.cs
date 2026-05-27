@@ -31,6 +31,8 @@ public class ArrowController : MonoBehaviour
     {
         if (!fired) return;
 
+        Debug.Log($"[Arrow] Hit: {collision.gameObject.name} (layer: {LayerMask.LayerToName(collision.gameObject.layer)})");
+
         TargetHitDetector target = collision.gameObject.GetComponentInParent<TargetHitDetector>();
 
         if (target != null)
