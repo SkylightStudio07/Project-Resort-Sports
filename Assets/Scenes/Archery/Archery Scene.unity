@@ -1004,7 +1004,7 @@ MonoBehaviour:
   maxPullDistance: 0.35
   attachOffset: {x: 0.2, y: -0.3, z: 0.5}
   attachRotation: {x: 0, y: -80, z: 0}
-  rightHandAnchor: {fileID: 0}
+  rightHandAnchor: {fileID: 1228870271}
   isHeld: 0
   activePull: {fileID: 0}
 --- !u!4 &622130042 stripped
@@ -1449,6 +1449,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 622130042}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1228870271 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7277802327528778794, guid: 77e7c27b2c5525e4aa8cc9f99d654486, type: 3}
+  m_PrefabInstance: {fileID: 2033293}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1368267334
 GameObject:
   m_ObjectHideFlags: 0
