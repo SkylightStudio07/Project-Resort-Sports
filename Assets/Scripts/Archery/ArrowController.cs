@@ -13,10 +13,9 @@ public class ArrowController : MonoBehaviour
 
     public void Fire(Vector3 direction, float force)
     {
-        rb.isKinematic=false;
+        rb.isKinematic = false;
         rb.AddForce(direction * force, ForceMode.Impulse);
         fired = true;
-        Destroy(gameObject, 5f);
     }
 
     private void Update()
@@ -43,7 +42,7 @@ public class ArrowController : MonoBehaviour
 
         rb.isKinematic = true;
         fired = false;
-        Destroy(gameObject, 3f);
+        Destroy(gameObject, 5f);
     }
 
     private void StickTo(Transform target)

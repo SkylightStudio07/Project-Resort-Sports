@@ -26,13 +26,11 @@ public class ArrowSpawner : MonoBehaviour
 
     public void FireArrow(float pullAmount)
     {
-        if (currentArrow == null)
-        {
-            return;
-        }
+        if (currentArrow == null) return;
+        if (gameManager.State != ArcheryGameManager.GameState.Playing) return;
 
         var arrow = currentArrow.GetComponent<ArrowController>();
-        arrow.Fire(currentArrow.transform.forward, pullAmount * maxForce);
+        arrow.Fire(Camera.main.transform.forward, pullAmount * maxForce);
         currentArrow = null;
 
         gameManager.OnArrowFired();
