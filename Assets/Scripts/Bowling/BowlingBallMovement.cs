@@ -97,20 +97,27 @@ public class BowlingBallMovement : MonoBehaviour
     {
         Vector3 velocity = _handVelocity * throwMultiplier;
 
-        // 레인 방향 기준이 있으면 전진 성분만 살리고 좌우/위아래는 줄임
         if (laneForwardReference != null)
         {
             Vector3 forward = laneForwardReference.forward;
-            float speed = Vector3.Dot(velocity, forward);
-            speed = Mathf.Max(speed, 2f);
-            velocity = forward * speed;
+            Vector3 right   = laneForwardReference.right;
+
+            // 전진 속도 (레인 방향)
+            float forwardSpeed = Vector3.Dot(velocity, forward);
+            forwardSpeed       = Mathf.Max(forwardSpeed, 2f); // 최소 속도 보장
+
+            // 좌우 속도 (손 스윙 좌우 성분 반영, 전진 속도의 50%로 제한)
+            float sideSpeed = Vector3.Dot(velocity, right);
+            sideSpeed       = Mathf.Clamp(sideSpeed, -forwardSpeed * 0.5f, forwardSpeed * 0.5f);
+
+            velocity = forward * forwardSpeed + right * sideSpeed;
         }
 
-        rb.isKinematic    = false;
-        rb.velocity = velocity;
+        rb.isKinematic     = false;
+        rb.velocity        = velocity;
         rb.angularVelocity = new Vector3(velocity.magnitude * 0.5f, 0f, 0f);
 
-        Debug.Log($"[BowlingBall] 투구! 속도: {velocity.magnitude:F1} m/s");
+        Debug.Log($"[BowlingBall] 투구! 속도: {velocity.magnitude:F1} m/s  좌우: {velocity.x:F1}");
     }
 
 
@@ -133,5 +140,20 @@ public class BowlingBallMovement : MonoBehaviour
         if (grab.isSelected && grab.interactorsSelecting.Count > 0)
             return grab.interactorsSelecting[0].transform.position;
         return transform.position;
+    }
+
+    // ── 거터 판정 ──────────────────────────────────────────────────────
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Gutter"))
+        {
+            // 속도를 레인 방향으로만 유지 (옆으로 더 안 빠지게)
+            Vector3 gutterVel = rb.velocity;
+            gutterVel.x = 0f;
+            rb.velocity = gutterVel;
+
+            Debug.Log("[BowlingBall] 거터!");
+        }
     }
 }
