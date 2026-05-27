@@ -3,7 +3,8 @@
     "allow": [
       "Bash(xargs grep *)",
       "WebSearch",
-      "WebFetch(domain:docs.unity3d.com)"
+      "WebFetch(domain:docs.unity3d.com)",
+      "Bash(python3 *)"
     ]
   }
 }

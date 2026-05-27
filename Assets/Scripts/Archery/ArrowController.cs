@@ -31,7 +31,7 @@ public class ArrowController : MonoBehaviour
     {
         if (!fired) return;
 
-        TargetHitDetector target = collision.gameObject.GetComponent<TargetHitDetector>();
+        TargetHitDetector target = collision.gameObject.GetComponentInParent<TargetHitDetector>();
 
         if (target != null)
         {
