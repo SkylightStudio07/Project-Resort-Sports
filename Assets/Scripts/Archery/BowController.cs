@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
@@ -20,6 +21,10 @@ public class BowController : MonoBehaviour
     [SerializeField]
     private Vector3 attachRotation = new Vector3(0f, -80f, 0f);
 
+    [Header("Draw Settings")]
+    [SerializeField]
+    private Transform rightHandAnchor;
+
     [HideInInspector]
     public bool isHeld = false;
     [HideInInspector]
@@ -29,8 +34,8 @@ public class BowController : MonoBehaviour
     private ArrowSpawner arrowSpawner;
     private Rigidbody rb;
     private Vector3 defaultStringPos;
-    private bool isAttached = false;
-    private Transform grabHandTransform;
+    private bool isDrawing = false;
+    private bool prevTrigger = false;
     private float pullAmount = 0f;
 
     public Transform NockingPoint => nockingPoint;
@@ -43,9 +48,7 @@ public class BowController : MonoBehaviour
 
         grabInteractable.trackPosition = false;
         grabInteractable.trackRotation = false;
-
         grabInteractable.selectEntered.AddListener(OnGrabbed);
-        grabInteractable.selectExited.AddListener(OnReleased);
 
         if (wbStringBone != null)
             defaultStringPos = wbStringBone.localPosition;
@@ -55,23 +58,50 @@ public class BowController : MonoBehaviour
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
-        if (isAttached) return;
+        if (isHeld) return;
 
         isHeld = true;
-        isAttached = true;
-        grabHandTransform = args.interactorObject.transform;
-
         rb.isKinematic = true;
         transform.SetParent(Camera.main.transform);
         transform.localPosition = attachOffset;
         transform.localRotation = Quaternion.Euler(attachRotation);
+        grabInteractable.enabled = false;
+    }
 
+    private void Update()
+    {
+        if (!isHeld) return;
+
+        var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        rightHand.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue);
+        bool triggerDown = triggerValue > 0.5f;
+
+        if (triggerDown && !prevTrigger)
+            OnTriggerPressed();
+
+        if (!triggerDown && prevTrigger)
+            OnTriggerReleased();
+
+        prevTrigger = triggerDown;
+
+        if (isDrawing && rightHandAnchor != null)
+        {
+            float distance = Vector3.Distance(rightHandAnchor.position, nockingPoint.position);
+            pullAmount = Mathf.Clamp01(distance / maxPullDistance);
+            UpdateString(pullAmount);
+        }
+    }
+
+    private void OnTriggerPressed()
+    {
+        if (isDrawing) return;
+        isDrawing = true;
         arrowSpawner.SpawnArrow();
     }
 
-    private void OnReleased(SelectExitEventArgs args)
+    private void OnTriggerReleased()
     {
-        if (!isAttached) return;
+        if (!isDrawing) return;
 
         if (pullAmount > 0.1f)
             arrowSpawner.FireArrow(pullAmount);
@@ -79,19 +109,8 @@ public class BowController : MonoBehaviour
             arrowSpawner.CancelArrow();
 
         pullAmount = 0f;
+        isDrawing = false;
         UpdateString(0f);
-        isHeld = false;
-        isAttached = false;
-        grabHandTransform = null;
-    }
-
-    private void Update()
-    {
-        if (!isHeld || grabHandTransform == null) return;
-
-        float distance = Vector3.Distance(grabHandTransform.position, nockingPoint.position);
-        pullAmount = Mathf.Clamp01(distance / maxPullDistance);
-        UpdateString(pullAmount);
     }
 
     public void UpdateString(float pull)
