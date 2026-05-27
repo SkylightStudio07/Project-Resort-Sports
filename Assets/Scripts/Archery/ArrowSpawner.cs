@@ -29,6 +29,12 @@ public class ArrowSpawner : MonoBehaviour
         if (currentArrow == null) return;
         if (gameManager.State != ArcheryGameManager.GameState.Playing) return;
 
+        var arrowColliders = currentArrow.GetComponentsInChildren<Collider>();
+        var bowColliders = GetComponentsInChildren<Collider>();
+        foreach (var ac in arrowColliders)
+            foreach (var bc in bowColliders)
+                Physics.IgnoreCollision(ac, bc);
+
         var arrow = currentArrow.GetComponent<ArrowController>();
         arrow.Fire(Camera.main.transform.forward, pullAmount * maxForce);
         currentArrow = null;
