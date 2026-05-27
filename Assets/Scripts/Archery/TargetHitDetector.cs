@@ -33,4 +33,10 @@ public class TargetHitDetector : MonoBehaviour
         }
         return Mathf.Max(1, 10 - Mathf.FloorToInt(ratio * 10));
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, targetRadius);
+    }
 }

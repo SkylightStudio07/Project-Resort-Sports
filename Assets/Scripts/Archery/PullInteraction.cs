@@ -20,6 +20,13 @@ public class PullInteraction : MonoBehaviour
         bow = GetComponentInParent<BowController>();
         interactable = GetComponent<XRGrabInteractable>();
         arrowSpawner = GetComponentInParent<ArrowSpawner>();
+
+        if (interactable == null)
+        {
+            enabled = false;
+            return;
+        }
+
         interactable.selectEntered.AddListener(OnStartPull);
         interactable.selectExited.AddListener(OnStopPull);
     }
