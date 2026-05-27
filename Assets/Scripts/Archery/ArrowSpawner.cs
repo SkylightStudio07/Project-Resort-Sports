@@ -18,10 +18,10 @@ public class ArrowSpawner : MonoBehaviour
     public void SpawnArrow()
     {
         if (currentArrow != null)
-        {
-            Destroy (currentArrow);
-        }
-        currentArrow = Instantiate(arrowPrefab, nockingPoint.position, nockingPoint.rotation);
+            Destroy(currentArrow);
+
+        Quaternion rot = Quaternion.LookRotation(Camera.main.transform.forward) * Quaternion.Euler(90f, 0f, 0f);
+        currentArrow = Instantiate(arrowPrefab, nockingPoint.position, rot);
     }
 
     public void FireArrow(float pullAmount)
@@ -49,7 +49,8 @@ public class ArrowSpawner : MonoBehaviour
     {
         if (currentArrow != null)
         {
-            currentArrow.transform.SetPositionAndRotation(nockingPoint.position, nockingPoint.rotation);
+            Quaternion rot = Quaternion.LookRotation(Camera.main.transform.forward) * Quaternion.Euler(90f, 0f, 0f);
+            currentArrow.transform.SetPositionAndRotation(nockingPoint.position, rot);
         }
     }
 }

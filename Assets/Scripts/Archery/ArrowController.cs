@@ -24,7 +24,7 @@ public class ArrowController : MonoBehaviour
         {
             return;
         }
-        transform.rotation = Quaternion.LookRotation(rb.velocity);
+        transform.rotation = Quaternion.LookRotation(rb.velocity) * Quaternion.Euler(90f, 0f, 0f);
     }
 
     private void OnCollisionEnter(Collision collision)

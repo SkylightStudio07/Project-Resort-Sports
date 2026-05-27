@@ -84,9 +84,23 @@ public class BowController : MonoBehaviour
 
         prevTrigger = triggerDown;
 
-        if (isDrawing && rightHandAnchor != null)
+        if (isDrawing)
         {
-            float distance = Vector3.Distance(rightHandAnchor.position, nockingPoint.position);
+            Vector3 rightHandPos;
+            if (rightHandAnchor != null)
+            {
+                rightHandPos = rightHandAnchor.position;
+            }
+            else
+            {
+                var rightHand2 = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+                rightHand2.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 localPos);
+                rightHandPos = Camera.main.transform.parent != null
+                    ? Camera.main.transform.parent.TransformPoint(localPos)
+                    : localPos;
+            }
+
+            float distance = Vector3.Distance(rightHandPos, nockingPoint.position);
             pullAmount = Mathf.Clamp01(distance / maxPullDistance);
             UpdateString(pullAmount);
         }
