@@ -1644,7 +1644,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 713807153}
   ui: {fileID: 546750812}
-  targetRadius: 1.75
+  targetRadius: 0.5
 --- !u!4 &1800583435 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4429432022911190, guid: d03c4353fda446d4f8df56d422578d64, type: 3}
