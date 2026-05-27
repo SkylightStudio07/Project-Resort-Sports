@@ -14,6 +14,7 @@ public class ArrowController : MonoBehaviour
     public void Fire(Vector3 direction, float force)
     {
         rb.isKinematic = false;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
         rb.AddForce(direction * force, ForceMode.Impulse);
         fired = true;
     }

@@ -9,6 +9,9 @@ public class TargetHitDetector : MonoBehaviour
     private ArcheryUI ui;
     [SerializeField]
     private float targetRadius = 0.5f;
+    [SerializeField]
+    [Range(0.05f, 0.4f)]
+    private float bullseyeRatio = 0.15f;
 
     public void RegisterHit(Vector3 hitWorldPos)
     {
@@ -29,11 +32,11 @@ public class TargetHitDetector : MonoBehaviour
 
     private int CalculateScore(float ratio)
     {
-        if (ratio > 1f)
-        {
-            return 0;
-        }
-        return Mathf.Max(1, 10 - Mathf.FloorToInt(ratio * 10));
+        if (ratio > 1f) return 0;
+        if (ratio <= bullseyeRatio) return 10;
+
+        float adjusted = (ratio - bullseyeRatio) / (1f - bullseyeRatio);
+        return Mathf.Max(1, 9 - Mathf.FloorToInt(adjusted * 9));
     }
 
     private void OnDrawGizmosSelected()
