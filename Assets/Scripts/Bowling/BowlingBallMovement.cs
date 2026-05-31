@@ -24,6 +24,8 @@ public class BowlingBallMovement : MonoBehaviour
     [Tooltip("레인 방향 (볼이 굴러갈 forward 기준 오브젝트)")]
     public Transform laneForwardReference;
 
+    public PinManager pinManager;
+
     private XRGrabInteractable grab;
     private Rigidbody          rb;
 
@@ -125,6 +127,8 @@ public class BowlingBallMovement : MonoBehaviour
         rb.isKinematic     = false;
         rb.velocity        = velocity;
         rb.angularVelocity = new Vector3(velocity.magnitude * 0.5f, 0f, 0f);
+
+        pinManager?.OnBallThrown();
 
         Debug.Log($"[BowlingBall] 투구! 속도: {velocity.magnitude:F1} m/s  좌우: {velocity.x:F1}");
     }
