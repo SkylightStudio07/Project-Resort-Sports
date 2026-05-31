@@ -1,9 +1,7 @@
 using UnityEngine;
 
-/// <summary>
-/// 개별 핀의 쓰러짐을 감지합니다.
-/// 핀의 기울기가 임계값(45도) 이상이면 쓰러진 것으로 판정합니다.
-/// </summary>
+// 개별 핀의 쓰러짐을 감지
+// 핀의 기울기가 임계값(45도) 이상이면 쓰러진 것으로 판정
 public class PinBehavior : MonoBehaviour
 {
     [Tooltip("쓰러진 것으로 판정할 기울기 각도")]
@@ -39,7 +37,7 @@ public class PinBehavior : MonoBehaviour
         }
     }
 
-    /// <summary>프레임 시작 시 핀 상태를 초기화합니다.</summary>
+    // 프레임 시작 시 핀 상태를 초기화
     public void ResetPin()
     {
         IsFallen   = false;

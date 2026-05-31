@@ -3,9 +3,9 @@ using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
-/// 볼링공 잡기 + 굴리기
-/// - Grip + Trigger + Thumbstick(누름) 세 버튼 동시에 눌러야 잡힘
-/// - 놓으면 손 스윙 속도로 레인에 굴러감
+// 볼링공 잡기 + 굴리기
+// - Grip + Trigger + Thumbstick(누름) 세 버튼 동시에 눌러야 잡힘
+// - 놓으면 손 스윙 속도로 레인에 굴러감
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(XRGrabInteractable))]
 public class BowlingBallMovement : MonoBehaviour
@@ -24,7 +24,7 @@ public class BowlingBallMovement : MonoBehaviour
     [Tooltip("레인 방향 (볼이 굴러갈 forward 기준 오브젝트)")]
     public Transform laneForwardReference;
 
-    public PinManager pinManager;
+    public BallManager ballManager;
 
     private XRGrabInteractable grab;
     private Rigidbody          rb;
@@ -128,7 +128,7 @@ public class BowlingBallMovement : MonoBehaviour
         rb.velocity        = velocity;
         rb.angularVelocity = new Vector3(velocity.magnitude * 0.5f, 0f, 0f);
 
-        pinManager?.OnBallThrown();
+        ballManager?.OnBallThrown();
 
         Debug.Log($"[BowlingBall] 투구! 속도: {velocity.magnitude:F1} m/s  좌우: {velocity.x:F1}");
     }
@@ -155,18 +155,38 @@ public class BowlingBallMovement : MonoBehaviour
         return transform.position;
     }
 
-    // ── 거터 판정 ──────────────────────────────────────────────────────
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Gutter"))
         {
-            // 속도를 레인 방향으로만 유지 (옆으로 더 안 빠지게)
             Vector3 gutterVel = rb.velocity;
             gutterVel.x = 0f;
             rb.velocity = gutterVel;
-
             Debug.Log("[BowlingBall] 거터!");
         }
+
+        if (other.CompareTag("LaneEnd"))
+        {
+            ballManager?.OnBallReachedEnd();
+        }
+    }
+
+    /// <summary>BallManager에서 잡기 활성/비활성 제어 시 호출합니다.</summary>
+    public void SetGrabbable(bool enabled)
+    {
+        grab.enabled = enabled;
+    }
+
+    /// <summary>BallManager에서 볼 복귀 시 호출합니다.</summary>
+    public void ReturnToSpawn(Transform spawnPoint)
+    {
+        rb.velocity  = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic     = true;
+
+        transform.position = spawnPoint.position;
+        transform.rotation = spawnPoint.rotation;
+
+        rb.isKinematic = false;
     }
 }
