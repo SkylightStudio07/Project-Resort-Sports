@@ -31,6 +31,9 @@ public class BowlingBallMovement : MonoBehaviour
     private Vector3 _prevHandPos;
     private Vector3 _handVelocity;
 
+    // 제대로 잡혔을 때만 true → ThrowBall() 실행 조건
+    private bool _isProperlyGrabbed = false;
+
     private void Awake()
     {
         grab = GetComponent<XRGrabInteractable>();
@@ -78,18 +81,24 @@ public class BowlingBallMovement : MonoBehaviour
         // 잡는 순간 세 버튼이 모두 눌려 있지 않으면 즉시 놓기
         if (!AllButtonsHeld())
         {
+            _isProperlyGrabbed = false; // 제대로 안 잡힌 상태로 명시
             grab.interactionManager.SelectExit(args.interactorObject, grab);
             return;
         }
 
-        _prevHandPos  = GetHandPosition();
-        _handVelocity = Vector3.zero;
+        _isProperlyGrabbed = true;
+        _prevHandPos       = GetHandPosition();
+        _handVelocity      = Vector3.zero;
 
         Debug.Log("[BowlingBall] 잡았다!");
     }
 
     private void OnReleased(SelectExitEventArgs args)
     {
+        // 제대로 잡힌 상태에서 놓았을 때만 투구
+        if (!_isProperlyGrabbed) return;
+
+        _isProperlyGrabbed = false;
         ThrowBall();
     }
 
