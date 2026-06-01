@@ -8,12 +8,17 @@ public class BowController : MonoBehaviour
     [SerializeField] private Transform wbStringBone;
     [SerializeField] private float pullOffset = 0.05f;
 
+    [Header("Camera Attach Settings")]
+    [SerializeField] private Vector3 attachOffset = new Vector3(0.2f, -0.3f, 0.5f);
+    [SerializeField] private Vector3 attachRotation = new Vector3(0f, -80f, 0f);
+
     [HideInInspector] public bool isHeld = false;
     [HideInInspector] public PullInteraction activePull = null;
 
     private XRGrabInteractable grabInteractable;
     private Rigidbody rb;
     private Vector3 defaultStringPos;
+    private Camera mainCamera;
 
     public Transform NockingPoint => nockingPoint;
 
@@ -21,9 +26,11 @@ public class BowController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         grabInteractable = GetComponent<XRGrabInteractable>();
+        mainCamera = Camera.main;
 
+        grabInteractable.trackPosition = false;
+        grabInteractable.trackRotation = false;
         grabInteractable.selectEntered.AddListener(OnGrabbed);
-        grabInteractable.selectExited.AddListener(OnReleased);
 
         if (wbStringBone != null)
             defaultStringPos = wbStringBone.localPosition;
@@ -33,15 +40,14 @@ public class BowController : MonoBehaviour
 
     private void OnGrabbed(SelectEnterEventArgs args)
     {
+        if (isHeld) return;
+
         isHeld = true;
         rb.isKinematic = true;
-    }
-
-    private void OnReleased(SelectExitEventArgs args)
-    {
-        isHeld = false;
-        rb.isKinematic = false;
-        activePull?.CancelPull();
+        transform.SetParent(mainCamera.transform);
+        transform.localPosition = attachOffset;
+        transform.localRotation = Quaternion.Euler(attachRotation);
+        grabInteractable.enabled = false;
     }
 
     public void UpdateString(float pull)
