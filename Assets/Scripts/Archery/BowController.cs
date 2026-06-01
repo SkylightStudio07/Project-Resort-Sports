@@ -10,9 +10,13 @@ public class BowController : MonoBehaviour
     [SerializeField] private float pullOffset = 0.05f;
     [SerializeField] private float maxPullDistance = 0.35f;
 
-    [Header("Camera Attach Settings")]
-    [SerializeField] private Vector3 attachOffset = new Vector3(0.2f, -0.3f, 0.5f);
-    [SerializeField] private Vector3 attachRotation = new Vector3(0f, -80f, 0f);
+    [Header("Left Hand Settings")]
+    [SerializeField] private Vector3 leftHandRotationOffset = Vector3.zero;
+
+    [Header("Aim Crosshair")]
+    [SerializeField] private Transform aimCrosshair;
+    [SerializeField] private LineRenderer aimLine;
+    [SerializeField] private float aimMaxDistance = 50f;
 
     [Header("Haptic")]
     [SerializeField] private float maxHapticAmplitude = 0.6f;
@@ -51,6 +55,9 @@ public class BowController : MonoBehaviour
             defaultStringPos = wbStringBone.localPosition;
 
         UpdateString(0f);
+
+        if (aimCrosshair != null) aimCrosshair.gameObject.SetActive(false);
+        if (aimLine != null) aimLine.enabled = false;
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
@@ -59,15 +66,14 @@ public class BowController : MonoBehaviour
 
         isHeld = true;
         rb.isKinematic = true;
-        transform.SetParent(mainCamera.transform);
-        transform.localPosition = attachOffset;
-        transform.localRotation = Quaternion.Euler(attachRotation);
         grabInteractable.enabled = false;
     }
 
     private void Update()
     {
         if (!isHeld) return;
+
+        TrackLeftHand();
 
         var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         rightHand.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue);
@@ -91,6 +97,51 @@ public class BowController : MonoBehaviour
             pullAmount = Mathf.Clamp01(distance / maxPullDistance);
             UpdateString(pullAmount);
             rightHand.SendHapticImpulse(0, pullAmount * maxHapticAmplitude, Time.deltaTime);
+        }
+
+        UpdateAimCrosshair();
+    }
+
+    private void TrackLeftHand()
+    {
+        var leftHand = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+        if (!leftHand.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 localPos)) return;
+        if (!leftHand.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion localRot)) return;
+
+        Transform origin = mainCamera.transform.parent;
+        if (origin != null)
+        {
+            transform.position = origin.TransformPoint(localPos);
+            transform.rotation = origin.rotation * localRot * Quaternion.Euler(leftHandRotationOffset);
+        }
+        else
+        {
+            transform.position = localPos;
+            transform.rotation = localRot * Quaternion.Euler(leftHandRotationOffset);
+        }
+    }
+
+    private void UpdateAimCrosshair()
+    {
+        if (aimCrosshair == null && aimLine == null) return;
+
+        Ray ray = new Ray(nockingPoint.position, transform.forward);
+        bool hit = Physics.Raycast(ray, out RaycastHit hitInfo, aimMaxDistance);
+        Vector3 targetPoint = hit ? hitInfo.point : ray.GetPoint(aimMaxDistance);
+
+        if (aimCrosshair != null)
+        {
+            aimCrosshair.position = targetPoint;
+            aimCrosshair.rotation = Quaternion.LookRotation(mainCamera.transform.position - targetPoint);
+            aimCrosshair.gameObject.SetActive(true);
+        }
+
+        if (aimLine != null)
+        {
+            aimLine.positionCount = 2;
+            aimLine.enabled = true;
+            aimLine.SetPosition(0, nockingPoint.position);
+            aimLine.SetPosition(1, targetPoint);
         }
     }
 
