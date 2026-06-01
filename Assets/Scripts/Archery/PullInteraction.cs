@@ -61,7 +61,7 @@ public class PullInteraction : MonoBehaviour
         if (audioSource != null)
             audioSource.Stop();
 
-        if (isPulling && pullAmount > 0.1f)
+        if (pullAmount > 0.1f)
         {
             if (audioSource != null && fireClip != null)
                 audioSource.PlayOneShot(fireClip);

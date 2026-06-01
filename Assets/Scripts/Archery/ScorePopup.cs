@@ -12,6 +12,12 @@ public class ScorePopup : MonoBehaviour
 
     private float elapsed = 0f;
     private Color originalColor;
+    private Camera mainCamera;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
 
     public void Init(int score, Vector3 worldPos)
     {
@@ -26,9 +32,9 @@ public class ScorePopup : MonoBehaviour
 
         transform.position += Vector3.up * floatSpeed * Time.deltaTime;
 
-        if (Camera.main != null)
+        if (mainCamera != null)
         {
-            transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - transform.position);
+            transform.rotation = Quaternion.LookRotation(mainCamera.transform.position - transform.position);
         }
 
         float alpha = Mathf.Lerp(1f, 0f, elapsed / lifetime);

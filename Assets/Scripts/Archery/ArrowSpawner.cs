@@ -14,13 +14,19 @@ public class ArrowSpawner : MonoBehaviour
     private float maxForce = 30f;
 
     private GameObject currentArrow;
+    private Camera mainCamera;
+
+    private void Awake()
+    {
+        mainCamera = Camera.main;
+    }
 
     public void SpawnArrow()
     {
         if (currentArrow != null)
             Destroy(currentArrow);
 
-        Quaternion rot = Quaternion.LookRotation(Camera.main.transform.forward) * Quaternion.Euler(90f, 0f, 0f);
+        Quaternion rot = Quaternion.LookRotation(mainCamera.transform.forward) * Quaternion.Euler(90f, 0f, 0f);
         currentArrow = Instantiate(arrowPrefab, nockingPoint.position, rot);
     }
 
@@ -36,7 +42,7 @@ public class ArrowSpawner : MonoBehaviour
                 Physics.IgnoreCollision(ac, bc);
 
         var arrow = currentArrow.GetComponent<ArrowController>();
-        arrow.Fire(Camera.main.transform.forward, pullAmount * maxForce);
+        arrow.Fire(mainCamera.transform.forward, pullAmount * maxForce);
         currentArrow = null;
 
         gameManager.OnArrowFired();
@@ -46,7 +52,7 @@ public class ArrowSpawner : MonoBehaviour
     {
         if (currentArrow != null)
         {
-            Destroy (currentArrow);
+            Destroy(currentArrow);
         }
         currentArrow = null;
     }
@@ -55,7 +61,7 @@ public class ArrowSpawner : MonoBehaviour
     {
         if (currentArrow != null)
         {
-            Quaternion rot = Quaternion.LookRotation(Camera.main.transform.forward) * Quaternion.Euler(90f, 0f, 0f);
+            Quaternion rot = Quaternion.LookRotation(mainCamera.transform.forward) * Quaternion.Euler(90f, 0f, 0f);
             currentArrow.transform.SetPositionAndRotation(nockingPoint.position, rot);
         }
     }
