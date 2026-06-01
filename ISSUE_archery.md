@@ -36,49 +36,48 @@
 
 ## 2. 활 (Bow) 시스템
 
-- [ ] `Bow_Prefab` 생성
-  - [ ] 활 메시 임포트 또는 프리미티브로 대체 제작
-  - [ ] `XRGrabInteractable` 컴포넌트 추가 (왼손 소켓 지정)
-  - [ ] `Attach Transform` 설정 — 자연스러운 그립 위치·회전 조정
-  - [ ] `Nocking Point` 빈 오브젝트 추가 (화살 장전 위치)
-  - [ ] `String Top / Bottom Point` 빈 오브젝트 2개 추가 (시위 시각화 기준점)
-- [ ] `BowController.cs` 작성
-  - [ ] 활 잡힘/놓임 이벤트 처리 (`selectEntered` / `selectExited`)
-  - [ ] 시위 당김 상태에 따라 `LineRenderer` 시위 모양 업데이트
-  - [ ] 활 잡은 상태에서만 시위 인터랙션 활성화
+- [x] `Bow_Prefab` 생성
+  - [x] 활 메시 임포트 (Free medieval weapons 에셋)
+  - [x] `XRGrabInteractable` 컴포넌트 추가
+  - [x] `Nocking Point` 빈 오브젝트 추가 (화살 장전 위치)
+  - [x] `String Top / Bottom Point` 빈 오브젝트 추가 (stringTopnocking, stringBotnocking)
+- [x] `BowController.cs` 작성
+  - [x] 활 잡힘/놓임 이벤트 처리 (`selectEntered` / `selectExited`)
+  - [x] 왼손 컨트롤러 위치 추적 (XRGrabInteractable 기본 동작, 카메라 고정 제거)
+  - [x] 활 잡은 상태에서만 시위 인터랙션 활성화 (`isHeld` 플래그)
 
 ---
 
 ## 3. 시위 당김 (Pull Interaction) 시스템
 
-- [ ] `StringPullPoint_Prefab` 생성
-  - [ ] `XRDirectInteractable` 컴포넌트 추가 (오른손 전용)
-  - [ ] `Rigidbody` — Is Kinematic 설정
-- [ ] `PullInteraction.cs` 작성
-  - [ ] 오른손 컨트롤러 위치 ↔ `Nocking Point` 거리로 `pullAmount (0.0 ~ 1.0)` 계산
-  - [ ] 최대 당김 거리(`maxPullDistance`) Inspector 노출
-  - [ ] `pullAmount`에 따라 당김 햅틱 피드백 (세기 증가) — Vive 컨트롤러 햅틱 API 사용
-  - [ ] `pullAmount` 임계값(0.1 이하)에서 자동 장전 취소
+- [x] `StringPullPoint_Prefab` 생성
+  - [x] `XRGrabInteractable` 컴포넌트 추가 (오른손 전용)
+  - [x] `Rigidbody` — Is Kinematic 설정
+- [x] `PullInteraction.cs` 작성
+  - [x] 오른손 컨트롤러 위치 ↔ `Nocking Point` 거리로 `pullAmount (0.0 ~ 1.0)` 계산
+  - [x] 최대 당김 거리(`maxPullDistance`) Inspector 노출
+  - [x] `pullAmount`에 따라 당김 햅틱 피드백 (세기 증가) — Vive 컨트롤러 햅틱 API 사용
+  - [x] `pullAmount` 임계값(0.1 이하)에서 자동 장전 취소
 
 ---
 
 ## 4. 화살 (Arrow) 시스템
 
-- [ ] `Arrow_Prefab` 생성
-  - [ ] 화살 메시 임포트 또는 프리미티브(Cylinder + Cone) 대체 제작
-  - [ ] `Rigidbody` 추가 (발사 전: Is Kinematic, 발사 후: 활성화)
-  - [ ] `CapsuleCollider` 또는 `SphereCollider` (촉) 추가 — Trigger 설정
+- [x] `Arrow_Prefab` 생성
+  - [x] 화살 메시 임포트 (Free medieval weapons 에셋)
+  - [x] `Rigidbody` 추가 (발사 전: Is Kinematic, 발사 후: 활성화)
+  - [x] `CapsuleCollider` 추가
   - [ ] `TrailRenderer` 추가 (선택)
-- [ ] `ArrowController.cs` 작성
-  - [ ] 발사 시 `Rigidbody`에 `pullAmount × maxForce` 방향 힘 적용
-  - [ ] `Update`에서 `Rigidbody.velocity` 방향으로 화살 회전 추종
-  - [ ] 과녁 충돌 시 Rigidbody 비활성화 + 과녁 오브젝트의 자식으로 이동 (꽂힘 처리)
-  - [ ] 지면/벽 충돌 시 화살 비활성화 또는 제거
-  - [ ] 발사 후 일정 시간(예: 5초) 경과 시 자동 제거
-- [ ] `ArrowSpawner.cs` 작성
-  - [ ] 시위 당김 시작 시 `Arrow_Prefab`을 `Nocking Point`에 스폰
-  - [ ] 발사 또는 당김 취소 시 스폰된 화살 처리
-  - [ ] 남은 화살 수 차감 (`ArcheryGameManager` 연동)
+- [x] `ArrowController.cs` 작성
+  - [x] 발사 시 `Rigidbody`에 `pullAmount × maxForce` 방향 힘 적용
+  - [x] `Update`에서 `Rigidbody.velocity` 방향으로 화살 회전 추종
+  - [x] 과녁 충돌 시 Rigidbody 비활성화 + 과녁 오브젝트의 자식으로 이동 (꽂힘 처리)
+  - [x] 지면/벽 충돌 시 화살 비활성화 또는 제거
+  - [x] 발사 후 5초 경과 시 자동 제거
+- [x] `ArrowSpawner.cs` 작성
+  - [x] 시위 당김 시작 시 `Arrow_Prefab`을 `Nocking Point`에 스폰
+  - [x] 발사 또는 당김 취소 시 스폰된 화살 처리
+  - [x] 남은 화살 수 차감 (`ArcheryGameManager` 연동)
 
 ---
 
@@ -126,11 +125,11 @@
 
 ## 8. 오디오
 
-- [ ] 시위 당기는 소리 (당김 정도에 따라 피치 변화)
-- [ ] 발사음 (활시위 놓음)
+- [x] 시위 당기는 소리 — `PullInteraction`에서 루프 재생, 취소 시 정지 (bow_loading 클립 연결 완료)
+- [x] 발사음 — 오른손 놓을 때 `PlayOneShot` (클립 연결 완료)
 - [ ] 과녁 명중음 (점수 존별 다른 소리 또는 파티클)
 - [ ] 미스 소리 (땅/벽 명중)
-- [ ] `AudioManager` 또는 각 컴포넌트 내 `AudioSource` 설정
+- [x] `AudioSource` 설정 — `StringPullPoint`에 컴포넌트 추가 및 연결 완료
 
 ---
 
