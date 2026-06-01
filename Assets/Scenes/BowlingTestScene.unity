@@ -439,7 +439,7 @@ GameObject:
   - component: {fileID: 259339723}
   m_Layer: 0
   m_Name: LaneEndTrigger
-  m_TagString: Untagged
+  m_TagString: LaneEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2577,7 +2577,7 @@ MonoBehaviour:
   rightThumbAction: {fileID: 0}
   throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
-  ballManager: {fileID: 0}
+  ballManager: {fileID: 1488942457}
 --- !u!1 &1225963645 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 392309791159215933, guid: 050646a592c5c0e46827fdcf56e10924, type: 3}
@@ -2599,7 +2599,7 @@ MonoBehaviour:
   rightThumbAction: {fileID: 0}
   throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
-  ballManager: {fileID: 0}
+  ballManager: {fileID: 1488942457}
 --- !u!114 &1225963647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2786,7 +2786,7 @@ MonoBehaviour:
   rightThumbAction: {fileID: 0}
   throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
-  ballManager: {fileID: 0}
+  ballManager: {fileID: 1488942457}
 --- !u!114 &1225963651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3961,7 +3961,7 @@ MonoBehaviour:
   rightThumbAction: {fileID: 0}
   throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
-  ballManager: {fileID: 0}
+  ballManager: {fileID: 1488942457}
 --- !u!114 &1514173359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4379,7 +4379,7 @@ MonoBehaviour:
   rightThumbAction: {fileID: 0}
   throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
-  ballManager: {fileID: 0}
+  ballManager: {fileID: 1488942457}
 --- !u!114 &1881362418
 MonoBehaviour:
   m_ObjectHideFlags: 0
