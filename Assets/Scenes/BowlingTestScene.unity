@@ -699,7 +699,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1680501587, guid: d73cf8e1ff962e9439bb9c6cf4c6d686, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 2.4
       objectReference: {fileID: 0}
     - target: {fileID: 1767192439, guid: d73cf8e1ff962e9439bb9c6cf4c6d686, type: 3}
       propertyPath: m_BackGroundColor.a
@@ -719,7 +719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1178791450436251564, guid: d73cf8e1ff962e9439bb9c6cf4c6d686, type: 3}
       propertyPath: m_CameraYOffset
-      value: 2
+      value: 2.4
       objectReference: {fileID: 0}
     - target: {fileID: 1717954561962503725, guid: d73cf8e1ff962e9439bb9c6cf4c6d686, type: 3}
       propertyPath: m_Name
@@ -775,7 +775,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6232745470614056090, guid: d73cf8e1ff962e9439bb9c6cf4c6d686, type: 3}
       propertyPath: m_Height
-      value: 2
+      value: 2.4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2527,7 +2527,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1225963637}
   serializedVersion: 4
-  m_Mass: 10
+  m_Mass: 15
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -2575,7 +2575,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightTriggerAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   rightThumbAction: {fileID: 0}
-  throwMultiplier: 1.5
+  throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
   ballManager: {fileID: 0}
 --- !u!1 &1225963645 stripped
@@ -2597,7 +2597,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightTriggerAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   rightThumbAction: {fileID: 0}
-  throwMultiplier: 1.5
+  throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
   ballManager: {fileID: 0}
 --- !u!114 &1225963647
@@ -2784,7 +2784,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightTriggerAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   rightThumbAction: {fileID: 0}
-  throwMultiplier: 1.5
+  throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
   ballManager: {fileID: 0}
 --- !u!114 &1225963651
@@ -3959,7 +3959,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightTriggerAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   rightThumbAction: {fileID: 0}
-  throwMultiplier: 1.5
+  throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
   ballManager: {fileID: 0}
 --- !u!114 &1514173359
@@ -4377,7 +4377,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightTriggerAction: {fileID: 83097790271614945, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   rightThumbAction: {fileID: 0}
-  throwMultiplier: 1.5
+  throwMultiplier: 3.5
   laneForwardReference: {fileID: 819885355}
   ballManager: {fileID: 0}
 --- !u!114 &1881362418

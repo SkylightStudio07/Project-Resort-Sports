@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Anchor
   - Gutter
+  - LaneEnd
   layers:
   - Default
   - TransparentFX

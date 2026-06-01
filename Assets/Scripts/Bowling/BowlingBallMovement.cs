@@ -159,9 +159,13 @@ public class BowlingBallMovement : MonoBehaviour
     {
         if (other.CompareTag("Gutter"))
         {
-            Vector3 gutterVel = rb.velocity;
-            gutterVel.x = 0f;
-            rb.velocity = gutterVel;
+            // 속도 크기는 유지하고 방향을 레인 직진 방향으로 강제 전환
+            float   speed        = rb.velocity.magnitude;
+            Vector3 gutterDir    = laneForwardReference != null
+                                   ? laneForwardReference.forward
+                                   : transform.forward;
+            rb.velocity          = gutterDir * speed;
+            rb.angularVelocity   = new Vector3(speed * 0.5f, 0f, 0f);
             Debug.Log("[BowlingBall] 거터!");
         }
 
