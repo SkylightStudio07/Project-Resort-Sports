@@ -11,6 +11,7 @@ public class BowController : MonoBehaviour
     [SerializeField] private float maxPullDistance = 0.35f;
 
     [Header("Left Hand Settings")]
+    [SerializeField] private Vector3 leftHandPositionOffset = Vector3.zero;
     [SerializeField] private Vector3 leftHandRotationOffset = Vector3.zero;
 
     [Header("Aim Crosshair")]
@@ -119,6 +120,8 @@ public class BowController : MonoBehaviour
             transform.position = localPos;
             transform.rotation = localRot * Quaternion.Euler(leftHandRotationOffset);
         }
+
+        transform.position += transform.TransformDirection(leftHandPositionOffset);
     }
 
     private void UpdateAimCrosshair()
