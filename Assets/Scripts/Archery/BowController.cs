@@ -128,7 +128,7 @@ public class BowController : MonoBehaviour
     {
         if (aimCrosshair == null && aimLine == null) return;
 
-        Ray ray = new Ray(nockingPoint.position, transform.forward);
+        Ray ray = new Ray(nockingPoint.position, transform.right);
         bool hit = Physics.Raycast(ray, out RaycastHit hitInfo, aimMaxDistance);
         Vector3 targetPoint = hit ? hitInfo.point : ray.GetPoint(aimMaxDistance);
 

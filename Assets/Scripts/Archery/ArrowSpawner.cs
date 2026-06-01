@@ -26,7 +26,7 @@ public class ArrowSpawner : MonoBehaviour
         if (currentArrow != null)
             Destroy(currentArrow);
 
-        Quaternion rot = Quaternion.LookRotation(transform.forward) * Quaternion.Euler(90f, 0f, 0f);
+        Quaternion rot = Quaternion.LookRotation(transform.right) * Quaternion.Euler(90f, 0f, 0f);
         currentArrow = Instantiate(arrowPrefab, nockingPoint.position, rot);
     }
 
@@ -42,7 +42,7 @@ public class ArrowSpawner : MonoBehaviour
                 Physics.IgnoreCollision(ac, bc);
 
         var arrow = currentArrow.GetComponent<ArrowController>();
-        arrow.Fire(transform.forward, pullAmount * maxForce);
+        arrow.Fire(transform.right, pullAmount * maxForce);
         currentArrow = null;
 
         gameManager.OnArrowFired();
@@ -61,7 +61,7 @@ public class ArrowSpawner : MonoBehaviour
     {
         if (currentArrow != null)
         {
-            Quaternion rot = Quaternion.LookRotation(transform.forward) * Quaternion.Euler(90f, 0f, 0f);
+            Quaternion rot = Quaternion.LookRotation(transform.right) * Quaternion.Euler(90f, 0f, 0f);
             currentArrow.transform.SetPositionAndRotation(nockingPoint.position, rot);
         }
     }
