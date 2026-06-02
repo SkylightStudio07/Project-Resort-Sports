@@ -1,27 +1,20 @@
-using UnityEngine.UI;
+using TMPro;
 using UnityEngine;
 
 public class ArcheryUI : MonoBehaviour
 {
     [Header("HUD Settings")]
-    [SerializeField]
-    private Text roundText;
-    [SerializeField]
-    private Text scoreText;
-    [SerializeField]
-    private Text arrowsText;
-    [SerializeField]
-    private Text totalScoreText;
-    [SerializeField]
-    private Text finalScoreText;
+    [SerializeField] private TextMeshProUGUI setText;
+    [SerializeField] private TextMeshProUGUI arrowScoreText;
+    [SerializeField] private TextMeshProUGUI arrowsText;
+    [SerializeField] private TextMeshProUGUI totalScoreText;
+    [SerializeField] private TextMeshProUGUI finalScoreText;
 
     [Header("Popup Settings")]
-    [SerializeField]
-    private GameObject scorePopupPrefab;
+    [SerializeField] private GameObject scorePopupPrefab;
 
     [Header("Settings")]
-    [SerializeField]
-    private ArcheryGameManager gameManager;
+    [SerializeField] private ArcheryGameManager gameManager;
 
     private void Start()
     {
@@ -30,8 +23,8 @@ public class ArcheryUI : MonoBehaviour
 
     public void UpdateUI()
     {
-        roundText.text = $"Round {gameManager.CurrentRound} / {gameManager.TotalRounds}";
-        scoreText.text = $"Score : {gameManager.RoundScore}";
+        setText.text = $"Set {gameManager.CurrentSet + 1} / {gameManager.TotalSets}";
+        arrowScoreText.text = $"Score : {gameManager.LastArrowScore}";
         arrowsText.text = $"Arrows: {gameManager.ArrowsLeft}";
         totalScoreText.text = $"Total : {gameManager.TotalScore}";
         finalScoreText.gameObject.SetActive(false);
@@ -45,10 +38,7 @@ public class ArcheryUI : MonoBehaviour
 
     public void ShowScorePopup(int score, Vector3 worldPos)
     {
-        if (scorePopupPrefab == null)
-        {
-            return;
-        }
+        if (scorePopupPrefab == null) return;
         GameObject popup = Instantiate(scorePopupPrefab, worldPos, Quaternion.identity);
         popup.GetComponent<ScorePopup>().Init(score, worldPos);
     }
