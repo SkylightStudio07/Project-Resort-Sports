@@ -8,7 +8,6 @@ public class BowController : MonoBehaviour
     [SerializeField] private Transform nockingPoint;
     [SerializeField] private Transform wbStringBone;
     [SerializeField] private float pullOffset = 0.05f;
-    [SerializeField] private float maxPullDistance = 0.35f;
 
     [Header("Left Hand Settings")]
     [SerializeField] private Vector3 leftHandPositionOffset = Vector3.zero;
@@ -38,7 +37,8 @@ public class BowController : MonoBehaviour
     private bool isDrawing = false;
     private bool prevTrigger = false;
     private float pullAmount = 0f;
-    private float drawStartDistance = 0f;
+
+    private const float TriggerThreshold = 0.1f;
 
     public Transform NockingPoint => nockingPoint;
 
@@ -79,7 +79,7 @@ public class BowController : MonoBehaviour
 
         var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         rightHand.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue);
-        bool triggerDown = triggerValue > 0.5f;
+        bool triggerDown = triggerValue > TriggerThreshold;
 
         if (triggerDown && !prevTrigger)
             OnTriggerPressed();
@@ -90,14 +90,7 @@ public class BowController : MonoBehaviour
 
         if (isDrawing)
         {
-            rightHand.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 localPos);
-            Vector3 rightHandWorldPos = mainCamera.transform.parent != null
-                ? mainCamera.transform.parent.TransformPoint(localPos)
-                : localPos;
-
-            float distance = Vector3.Distance(rightHandWorldPos, nockingPoint.position);
-            float pullDelta = distance - drawStartDistance;
-            pullAmount = Mathf.Clamp01(pullDelta / maxPullDistance);
+            pullAmount = triggerValue;
             UpdateString(pullAmount);
             rightHand.SendHapticImpulse(0, pullAmount * maxHapticAmplitude, Time.deltaTime);
         }
@@ -154,15 +147,6 @@ public class BowController : MonoBehaviour
     {
         if (isDrawing) return;
         isDrawing = true;
-
-        var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-        if (rightHand.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 localPos))
-        {
-            Transform origin = mainCamera.transform.parent;
-            Vector3 rightHandWorldPos = origin != null ? origin.TransformPoint(localPos) : localPos;
-            drawStartDistance = Vector3.Distance(rightHandWorldPos, nockingPoint.position);
-        }
-
         arrowSpawner.SpawnArrow();
 
         if (audioSource != null && drawClip != null)
@@ -180,7 +164,7 @@ public class BowController : MonoBehaviour
         if (audioSource != null)
             audioSource.Stop();
 
-        if (pullAmount > 0.1f)
+        if (pullAmount > TriggerThreshold)
         {
             if (audioSource != null && fireClip != null)
                 audioSource.PlayOneShot(fireClip);
