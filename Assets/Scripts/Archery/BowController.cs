@@ -17,6 +17,7 @@ public class BowController : MonoBehaviour
     [SerializeField] private Transform aimCrosshair;
     [SerializeField] private LineRenderer aimLine;
     [SerializeField] private float aimMaxDistance = 50f;
+    [SerializeField] private float previewMaxForce = 30f;
 
     [Header("Haptic")]
     [SerializeField] private float maxHapticAmplitude = 0.6f;
@@ -39,10 +40,7 @@ public class BowController : MonoBehaviour
     private float pullAmount = 0f;
     private float peakPullAmount = 0f;
 
-    // 드로 시작 임계값 — 살짝 누르면 장전
-    private const float DrawStartThreshold = 0.1f;
-    // 발사 임계값 — 절반 이하로 내려가면 즉시 발사 (딜레이 제거)
-    private const float DrawReleaseThreshold = 0.5f;
+    private const float TriggerThreshold = 0.1f;
 
     public Transform NockingPoint => nockingPoint;
 
@@ -83,15 +81,11 @@ public class BowController : MonoBehaviour
 
         var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         rightHand.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue);
+        bool triggerDown = triggerValue > TriggerThreshold;
 
-        bool triggerDown = triggerValue > DrawStartThreshold;
-
-        // 드로 시작
         if (triggerDown && !prevTriggerDown)
             OnTriggerPressed();
-
-        // 발사: 드로 중 트리거가 절반 이하로 내려오면 즉시 발사
-        if (isDrawing && triggerValue < DrawReleaseThreshold && prevTriggerDown)
+        else if (!triggerDown && prevTriggerDown)
             OnTriggerReleased();
 
         prevTriggerDown = triggerDown;
@@ -132,14 +126,31 @@ public class BowController : MonoBehaviour
     {
         if (aimCrosshair == null && aimLine == null) return;
 
-        Ray ray = new Ray(nockingPoint.position, transform.right);
-        bool hit = Physics.Raycast(ray, out RaycastHit hitInfo, aimMaxDistance);
-        Vector3 targetPoint = hit ? hitInfo.point : ray.GetPoint(aimMaxDistance);
+        // 풀 차징 기준 포물선 탄착점 예측
+        Vector3 pos = nockingPoint.position;
+        Vector3 vel = transform.right * previewMaxForce;
+        float timeStep = 0.05f;
+        Vector3 hitPoint = pos + transform.right * aimMaxDistance;
+
+        for (int i = 0; i < 120; i++)
+        {
+            Vector3 nextPos = pos + vel * timeStep;
+            vel += Physics.gravity * timeStep;
+
+            if (Physics.Raycast(pos, nextPos - pos, out RaycastHit hit, Vector3.Distance(pos, nextPos)))
+            {
+                hitPoint = hit.point;
+                break;
+            }
+
+            pos = nextPos;
+            hitPoint = pos;
+        }
 
         if (aimCrosshair != null)
         {
-            aimCrosshair.position = targetPoint;
-            aimCrosshair.rotation = Quaternion.LookRotation(mainCamera.transform.position - targetPoint);
+            aimCrosshair.position = hitPoint;
+            aimCrosshair.rotation = Quaternion.LookRotation(mainCamera.transform.position - hitPoint);
             aimCrosshair.gameObject.SetActive(true);
         }
 
@@ -148,7 +159,7 @@ public class BowController : MonoBehaviour
             aimLine.positionCount = 2;
             aimLine.enabled = true;
             aimLine.SetPosition(0, nockingPoint.position);
-            aimLine.SetPosition(1, targetPoint);
+            aimLine.SetPosition(1, hitPoint);
         }
     }
 
@@ -174,7 +185,7 @@ public class BowController : MonoBehaviour
         if (audioSource != null)
             audioSource.Stop();
 
-        if (peakPullAmount > DrawStartThreshold)
+        if (peakPullAmount > TriggerThreshold)
         {
             if (audioSource != null && fireClip != null)
                 audioSource.PlayOneShot(fireClip);
