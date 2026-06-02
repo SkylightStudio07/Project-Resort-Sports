@@ -18,8 +18,15 @@ public class TargetPatrol : MonoBehaviour
             StartPatrol();
     }
 
+    public void SetConfig(float distance, float spd)
+    {
+        patrolDistance = distance;
+        speed = spd;
+    }
+
     public void StartPatrol()
     {
+        originPos = transform.position;
         timeOffset = Time.time;
         patrolling = true;
     }
@@ -34,7 +41,6 @@ public class TargetPatrol : MonoBehaviour
     {
         if (!patrolling) return;
 
-        // patrolDistance를 더해 위상을 맞춰 시작 시 중앙 → 오른쪽 → 왼쪽 순으로 이동
         float elapsed = (Time.time - timeOffset) * speed;
         float offset = Mathf.PingPong(elapsed + patrolDistance, patrolDistance * 2f) - patrolDistance;
         transform.position = originPos + transform.right * offset;
