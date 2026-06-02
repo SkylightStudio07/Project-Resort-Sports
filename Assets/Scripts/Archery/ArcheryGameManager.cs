@@ -106,6 +106,9 @@ public class ArcheryGameManager : MonoBehaviour
     {
         if (target != null)
         {
+            foreach (var arrow in target.GetComponentsInChildren<ArrowController>())
+                Destroy(arrow.gameObject);
+
             target.gameObject.SetActive(false);
             target.position = new Vector3(
                 basePosition.x + config.offsetX,

@@ -14,12 +14,6 @@ public class ArrowSpawner : MonoBehaviour
     private float maxForce = 30f;
 
     private GameObject currentArrow;
-    private Camera mainCamera;
-
-    private void Awake()
-    {
-        mainCamera = Camera.main;
-    }
 
     public void SpawnArrow()
     {
