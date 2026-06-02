@@ -41,12 +41,15 @@ public class ArcheryGameManager : MonoBehaviour
 
     public event System.Action OnSetStarted;
 
-    void Start()
+    private void Awake()
     {
         if (target != null)
             basePosition = target.position;
-        StartGame();
+        else
+            Debug.LogWarning("[ArcheryGameManager] target이 연결되지 않았습니다.");
     }
+
+    void Start() => StartGame();
 
     public void StartGame()
     {

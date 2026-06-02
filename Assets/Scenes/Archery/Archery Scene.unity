@@ -958,7 +958,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4620178347958848, guid: d03c4353fda446d4f8df56d422578d64, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.704
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 4620178347958848, guid: d03c4353fda446d4f8df56d422578d64, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1066,7 +1066,6 @@ MonoBehaviour:
   nockingPoint: {fileID: 2045624899}
   wbStringBone: {fileID: 1800583435}
   pullOffset: 0.2
-  maxPullDistance: 0.35
   leftHandPositionOffset: {x: 0, y: 0, z: -0.1}
   leftHandRotationOffset: {x: -90, y: -90, z: 0}
   aimCrosshair: {fileID: 1395587277}
