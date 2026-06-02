@@ -1600,26 +1600,31 @@ MonoBehaviour:
   target: {fileID: 1625069450}
   targetPatrol: {fileID: 1625069449}
   setConfigs:
-  - targetPosition: {x: 0, y: 0, z: 0}
+  - offsetX: 0
+    offsetZ: 0
     patrol: 0
     patrolDistance: 3
     patrolSpeed: 1.5
-  - targetPosition: {x: 0, y: 0, z: 0}
+  - offsetX: 0
+    offsetZ: -10
     patrol: 0
     patrolDistance: 3
     patrolSpeed: 1.5
-  - targetPosition: {x: 0, y: 0, z: 0}
+  - offsetX: 0
+    offsetZ: -15
     patrol: 0
     patrolDistance: 3
     patrolSpeed: 1.5
-  - targetPosition: {x: 0, y: 0, z: 0}
-    patrol: 0
+  - offsetX: 0
+    offsetZ: -20
+    patrol: 1
     patrolDistance: 3
     patrolSpeed: 1.5
-  - targetPosition: {x: 0, y: 0, z: 0}
-    patrol: 0
+  - offsetX: 0
+    offsetZ: -20
+    patrol: 1
     patrolDistance: 3
-    patrolSpeed: 1.5
+    patrolSpeed: 3
   ui: {fileID: 546750812}
 --- !u!4 &713807154
 Transform:
@@ -3198,7 +3203,7 @@ SceneRoots:
   - {fileID: 80162437}
   - {fileID: 1625069445}
   - {fileID: 1973908632}
-  - {fileID: 713807154}
   - {fileID: 622130037}
   - {fileID: 1526151192}
+  - {fileID: 713807154}
   - {fileID: 1395587277}

@@ -5,7 +5,9 @@ public class ArcheryGameManager : MonoBehaviour
     [System.Serializable]
     public class SetConfig
     {
-        public Vector3 targetPosition;
+        // Set 1은 (0, 0) 고정. Set 2~5는 Set 1 기준 X/Z 오프셋
+        public float offsetX;
+        public float offsetZ;
         public bool patrol;
         public float patrolDistance = 3f;
         public float patrolSpeed = 1.5f;
@@ -18,11 +20,13 @@ public class ArcheryGameManager : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private TargetPatrol targetPatrol;
 
-    [Header("Set Configs (5 sets)")]
+    [Header("Set Configs (5 sets) — offset from Set 1 position (X/Z only)")]
     [SerializeField] private SetConfig[] setConfigs = new SetConfig[5];
 
     [Header("UI")]
     [SerializeField] private ArcheryUI ui;
+
+    private Vector3 basePosition;
 
     public int ArrowsPerSet => arrowsPerSet;
     public int TotalSets => setConfigs.Length;
@@ -37,7 +41,12 @@ public class ArcheryGameManager : MonoBehaviour
 
     public event System.Action OnSetStarted;
 
-    void Start() => StartGame();
+    void Start()
+    {
+        if (target != null)
+            basePosition = target.position;
+        StartGame();
+    }
 
     public void StartGame()
     {
@@ -98,7 +107,11 @@ public class ArcheryGameManager : MonoBehaviour
         if (target != null)
         {
             target.gameObject.SetActive(false);
-            target.position = config.targetPosition;
+            target.position = new Vector3(
+                basePosition.x + config.offsetX,
+                basePosition.y,
+                basePosition.z + config.offsetZ
+            );
             target.gameObject.SetActive(true);
         }
 

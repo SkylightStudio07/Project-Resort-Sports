@@ -38,6 +38,7 @@ public class BowController : MonoBehaviour
     private bool isDrawing = false;
     private bool prevTrigger = false;
     private float pullAmount = 0f;
+    private float drawStartDistance = 0f;
 
     public Transform NockingPoint => nockingPoint;
 
@@ -95,7 +96,8 @@ public class BowController : MonoBehaviour
                 : localPos;
 
             float distance = Vector3.Distance(rightHandWorldPos, nockingPoint.position);
-            pullAmount = Mathf.Clamp01(distance / maxPullDistance);
+            float pullDelta = distance - drawStartDistance;
+            pullAmount = Mathf.Clamp01(pullDelta / maxPullDistance);
             UpdateString(pullAmount);
             rightHand.SendHapticImpulse(0, pullAmount * maxHapticAmplitude, Time.deltaTime);
         }
@@ -152,6 +154,15 @@ public class BowController : MonoBehaviour
     {
         if (isDrawing) return;
         isDrawing = true;
+
+        var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        if (rightHand.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 localPos))
+        {
+            Transform origin = mainCamera.transform.parent;
+            Vector3 rightHandWorldPos = origin != null ? origin.TransformPoint(localPos) : localPos;
+            drawStartDistance = Vector3.Distance(rightHandWorldPos, nockingPoint.position);
+        }
+
         arrowSpawner.SpawnArrow();
 
         if (audioSource != null && drawClip != null)
