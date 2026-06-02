@@ -35,10 +35,14 @@ public class BowController : MonoBehaviour
     private Vector3 defaultStringPos;
     private Camera mainCamera;
     private bool isDrawing = false;
-    private bool prevTrigger = false;
+    private bool prevTriggerDown = false;
     private float pullAmount = 0f;
+    private float peakPullAmount = 0f;
 
-    private const float TriggerThreshold = 0.1f;
+    // 드로 시작 임계값 — 살짝 누르면 장전
+    private const float DrawStartThreshold = 0.1f;
+    // 발사 임계값 — 절반 이하로 내려가면 즉시 발사 (딜레이 제거)
+    private const float DrawReleaseThreshold = 0.5f;
 
     public Transform NockingPoint => nockingPoint;
 
@@ -79,18 +83,23 @@ public class BowController : MonoBehaviour
 
         var rightHand = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         rightHand.TryGetFeatureValue(CommonUsages.trigger, out float triggerValue);
-        bool triggerDown = triggerValue > TriggerThreshold;
 
-        if (triggerDown && !prevTrigger)
+        bool triggerDown = triggerValue > DrawStartThreshold;
+
+        // 드로 시작
+        if (triggerDown && !prevTriggerDown)
             OnTriggerPressed();
-        else if (!triggerDown && prevTrigger)
+
+        // 발사: 드로 중 트리거가 절반 이하로 내려오면 즉시 발사
+        if (isDrawing && triggerValue < DrawReleaseThreshold && prevTriggerDown)
             OnTriggerReleased();
 
-        prevTrigger = triggerDown;
+        prevTriggerDown = triggerDown;
 
         if (isDrawing)
         {
             pullAmount = triggerValue;
+            peakPullAmount = Mathf.Max(peakPullAmount, pullAmount);
             UpdateString(pullAmount);
             rightHand.SendHapticImpulse(0, pullAmount * maxHapticAmplitude, Time.deltaTime);
         }
@@ -147,6 +156,7 @@ public class BowController : MonoBehaviour
     {
         if (isDrawing) return;
         isDrawing = true;
+        peakPullAmount = 0f;
         arrowSpawner.SpawnArrow();
 
         if (audioSource != null && drawClip != null)
@@ -164,16 +174,17 @@ public class BowController : MonoBehaviour
         if (audioSource != null)
             audioSource.Stop();
 
-        if (pullAmount > TriggerThreshold)
+        if (peakPullAmount > DrawStartThreshold)
         {
             if (audioSource != null && fireClip != null)
                 audioSource.PlayOneShot(fireClip);
-            arrowSpawner.FireArrow(pullAmount);
+            arrowSpawner.FireArrow(peakPullAmount);
         }
         else
             arrowSpawner.CancelArrow();
 
         pullAmount = 0f;
+        peakPullAmount = 0f;
         isDrawing = false;
         UpdateString(0f);
     }

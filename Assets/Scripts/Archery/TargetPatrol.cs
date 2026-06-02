@@ -5,15 +5,19 @@ public class TargetPatrol : MonoBehaviour
     [Header("Patrol Settings")]
     [SerializeField] private float patrolDistance = 3f;
     [SerializeField] private float speed = 1.5f;
-    [SerializeField] private bool patrolOnStart = true;
+    [SerializeField] private bool patrolOnStart = false;
 
     private Vector3 originPos;
     private bool patrolling = false;
     private float timeOffset = 0f;
 
-    private void Start()
+    private void Awake()
     {
         originPos = transform.position;
+    }
+
+    private void Start()
+    {
         if (patrolOnStart)
             StartPatrol();
     }
@@ -34,7 +38,6 @@ public class TargetPatrol : MonoBehaviour
     public void StopPatrol()
     {
         patrolling = false;
-        transform.position = originPos;
     }
 
     private void Update()

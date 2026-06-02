@@ -1067,7 +1067,7 @@ MonoBehaviour:
   wbStringBone: {fileID: 1800583435}
   pullOffset: 0.2
   leftHandPositionOffset: {x: 0, y: 0, z: -0.1}
-  leftHandRotationOffset: {x: -90, y: -90, z: 0}
+  leftHandRotationOffset: {x: 0, y: -90, z: -70}
   aimCrosshair: {fileID: 1395587277}
   aimLine: {fileID: 0}
   aimMaxDistance: 50
