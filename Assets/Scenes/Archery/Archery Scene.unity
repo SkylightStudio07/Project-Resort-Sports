@@ -1068,7 +1068,7 @@ MonoBehaviour:
   pullOffset: 0.2
   maxPullDistance: 0.35
   leftHandPositionOffset: {x: 0, y: 0, z: -0.2}
-  leftHandRotationOffset: {x: 0, y: -90, z: 0}
+  leftHandRotationOffset: {x: -90, y: -90, z: 0}
   aimCrosshair: {fileID: 1395587277}
   aimLine: {fileID: 0}
   aimMaxDistance: 50
