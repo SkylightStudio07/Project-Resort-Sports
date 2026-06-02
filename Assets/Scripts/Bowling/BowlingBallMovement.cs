@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -19,12 +20,21 @@ public class BowlingBallMovement : MonoBehaviour
 
     [Header("투구 설정")]
     [Tooltip("릴리즈 속도 배율")]
-    public float throwMultiplier = 1.5f;
+    public float throwMultiplier = 3.0f;
+
+    [Tooltip("최소 투구 속도 (m/s)")]
+    public float minThrowSpeed = 5f;
+
+    [Tooltip("최대 투구 속도 (m/s)")]
+    public float maxThrowSpeed = 15f;
 
     [Tooltip("레인 방향 (볼이 굴러갈 forward 기준 오브젝트)")]
     public Transform laneForwardReference;
 
     public BallManager ballManager;
+
+    /// <summary>거터에 진입했을 때 발생합니다. NotificationUI가 구독합니다.</summary>
+    public event Action OnGutterEntered;
 
     private XRGrabInteractable grab;
     private Rigidbody          rb;
@@ -115,7 +125,7 @@ public class BowlingBallMovement : MonoBehaviour
 
             // 전진 속도 (레인 방향)
             float forwardSpeed = Vector3.Dot(velocity, forward);
-            forwardSpeed       = Mathf.Max(forwardSpeed, 2f); // 최소 속도 보장
+            forwardSpeed       = Mathf.Clamp(forwardSpeed, minThrowSpeed, maxThrowSpeed);
 
             // 좌우 속도 (손 스윙 좌우 성분 반영, 전진 속도의 50%로 제한)
             float sideSpeed = Vector3.Dot(velocity, right);
@@ -166,6 +176,7 @@ public class BowlingBallMovement : MonoBehaviour
                                    : transform.forward;
             rb.velocity          = gutterDir * speed;
             rb.angularVelocity   = new Vector3(speed * 0.5f, 0f, 0f);
+            OnGutterEntered?.Invoke();
             Debug.Log("[BowlingBall] 거터!");
         }
 
