@@ -10,9 +10,6 @@ public class ArcheryUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI totalScoreText;
     [SerializeField] private TextMeshProUGUI finalScoreText;
 
-    [Header("Popup Settings")]
-    [SerializeField] private GameObject scorePopupPrefab;
-
     [Header("Settings")]
     [SerializeField] private ArcheryGameManager gameManager;
 
@@ -36,10 +33,4 @@ public class ArcheryUI : MonoBehaviour
         finalScoreText.text = $"Final Score: {total}";
     }
 
-    public void ShowScorePopup(int score, Vector3 worldPos)
-    {
-        if (scorePopupPrefab == null) return;
-        GameObject popup = Instantiate(scorePopupPrefab, worldPos, Quaternion.identity);
-        popup.GetComponent<ScorePopup>().Init(score, worldPos);
-    }
 }
