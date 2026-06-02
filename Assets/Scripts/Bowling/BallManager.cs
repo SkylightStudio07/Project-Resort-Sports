@@ -23,8 +23,9 @@ public class BallManager : MonoBehaviour
     public event Action OnBallReady;
 
     // ── 내부 상태 ────────────────────────────────────────────────────────
-    private bool _ballInFlight = false;
+    private bool _ballInFlight    = false;
     private bool _gutterThisThrow = false;
+    private bool _isProcessing    = false; // ProcessThrow 중복 실행 방지
 
     // ── Unity 생명주기 ───────────────────────────────────────────────────
 
@@ -55,7 +56,8 @@ public class BallManager : MonoBehaviour
 
     public void OnBallReachedEnd()
     {
-        if (!_ballInFlight) return;
+        if (!_ballInFlight || _isProcessing) return;
+        _isProcessing = true;
         StartCoroutine(ProcessThrow());
     }
 
@@ -81,6 +83,7 @@ public class BallManager : MonoBehaviour
 
         _ballInFlight    = false;
         _gutterThisThrow = false;
+        _isProcessing    = false;
         ball.ReturnToSpawn(spawnPoint);
         ball.SetGrabbable(true);
         OnBallReady?.Invoke();
