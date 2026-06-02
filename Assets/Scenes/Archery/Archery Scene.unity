@@ -913,7 +913,6 @@ MonoBehaviour:
   arrowsText: {fileID: 301438033}
   totalScoreText: {fileID: 2012329566}
   finalScoreText: {fileID: 1347133558}
-  scorePopupPrefab: {fileID: 2953420891301247052, guid: a11396a12d2675648bb316ea10abc528, type: 3}
   gameManager: {fileID: 713807153}
 --- !u!114 &546750813
 MonoBehaviour:
@@ -1598,8 +1597,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrowsPerSet: 5
-  target: {fileID: 0}
-  targetPatrol: {fileID: 0}
+  target: {fileID: 1625069450}
+  targetPatrol: {fileID: 1625069449}
   setConfigs:
   - targetPosition: {x: 0, y: 0, z: 0}
     patrol: 0
@@ -2767,7 +2766,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 713807153}
-  ui: {fileID: 546750812}
   targetRadius: 0.5
   bullseyeRatio: 0.15
 --- !u!1 &1625069448 stripped
@@ -2790,6 +2788,11 @@ MonoBehaviour:
   patrolDistance: 3
   speed: 1.5
   patrolOnStart: 0
+--- !u!4 &1625069450 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9040400755245757577, guid: 64cd3e3d7c0a4eb4982eab7024a1ee9b, type: 3}
+  m_PrefabInstance: {fileID: 1625069445}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1800583435 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4429432022911190, guid: d03c4353fda446d4f8df56d422578d64, type: 3}
