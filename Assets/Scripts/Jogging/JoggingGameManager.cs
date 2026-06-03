@@ -1,6 +1,8 @@
 using ResortSports.Jogging;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.XR;
 
 namespace ResortSports.Jogging
 {
@@ -25,7 +27,28 @@ namespace ResortSports.Jogging
         public float targetDistance = 0f;
 
         [Tooltip("자동으로 시작할지 여부")]
-        public bool autoStart = true;
+        public bool autoStart = false;
+
+        [Header("Interaction")]
+        [Tooltip("조깅 시작 인터랙션 위치. 비워두면 트랙의 첫 지점을 사용합니다.")]
+        public Transform startInteractionPoint;
+
+        [Tooltip("이 거리 안에서 시작 입력을 누르면 조깅을 시작합니다.")]
+        [Range(0.25f, 10f)] public float interactionDistance = 2f;
+
+        [Tooltip("테스트용 키보드 시작 입력을 허용합니다.")]
+        public bool allowKeyboardStart = true;
+        public KeyCode keyboardStartKey = KeyCode.E;
+
+        [Tooltip("VR 컨트롤러 Primary Button(A/X 등)으로 시작합니다.")]
+        public bool allowXRStart = true;
+
+        [Tooltip("러닝 중 키보드 포기 입력을 허용합니다.")]
+        public bool allowKeyboardCancel = true;
+        public KeyCode keyboardCancelKey = KeyCode.Escape;
+
+        [Tooltip("러닝 중 VR 컨트롤러 Secondary Button(B/Y 등)으로 포기합니다.")]
+        public bool allowXRCancel = true;
 
         [Header("Events")]
         public UnityEvent onStarted;
@@ -37,21 +60,26 @@ namespace ResortSports.Jogging
             ElapsedTime > 0.01f && player != null ? player.CurrentDistance / ElapsedTime : 0f;
 
         private float _goalDistance;
+        private bool _wasXRStartPressed;
+        private bool _wasXRCancelPressed;
+        private static readonly List<InputDevice> _inputDevices = new List<InputDevice>();
 
         private void Start()
         {
+            if (player != null) player.StopRun();
             if (autoStart) BeginRun();
         }
 
         public void BeginRun()
         {
+            if (State == GameState.Running) return;
             if (track == null || player == null)
             {
                 Debug.LogWarning("[JoggingGameManager] track/player가 비어 있어 시작할 수 없습니다.");
                 return;
             }
             _goalDistance = targetDistance > 0f ? targetDistance : track.TotalLength;
-            player.ResetToStart();
+            player.BeginRun();
             ElapsedTime = 0f;
             State = GameState.Running;
             onStarted?.Invoke();
@@ -59,19 +87,88 @@ namespace ResortSports.Jogging
 
         public void EndRun()
         {
-            if (State == GameState.Finished) return;
+            if (State != GameState.Running) return;
+            if (player != null) player.StopRun();
             State = GameState.Finished;
             onFinished?.Invoke();
         }
 
         private void Update()
         {
-            if (State != GameState.Running) return;
+            if (State != GameState.Running)
+            {
+                TryBeginRunFromInteraction();
+                return;
+            }
 
             ElapsedTime += Time.deltaTime;
 
+            if (IsCancelPressed())
+            {
+                EndRun();
+                return;
+            }
+
             if (player != null && _goalDistance > 0f && player.CurrentDistance >= _goalDistance)
                 EndRun();
+        }
+
+        private void TryBeginRunFromInteraction()
+        {
+            if (!IsPlayerNearStart()) return;
+            if (IsStartPressed()) BeginRun();
+        }
+
+        private bool IsPlayerNearStart()
+        {
+            if (player == null || player.XrOrigin == null || track == null) return false;
+
+            Vector3 startPosition = startInteractionPoint != null
+                ? startInteractionPoint.position
+                : track.GetPositionAtDistance(0f);
+
+            Vector3 playerPosition = player.XrOrigin.position;
+            startPosition.y = 0f;
+            playerPosition.y = 0f;
+            return Vector3.Distance(playerPosition, startPosition) <= interactionDistance;
+        }
+
+        private bool IsStartPressed()
+        {
+            if (allowKeyboardStart && Input.GetKeyDown(keyboardStartKey)) return true;
+            if (!allowXRStart) return false;
+
+            bool pressed = TryGetXRButton(CommonUsages.primaryButton);
+            bool pressedThisFrame = pressed && !_wasXRStartPressed;
+            _wasXRStartPressed = pressed;
+            return pressedThisFrame;
+        }
+
+        private bool IsCancelPressed()
+        {
+            if (allowKeyboardCancel && Input.GetKeyDown(keyboardCancelKey)) return true;
+            if (!allowXRCancel) return false;
+
+            bool pressed = TryGetXRButton(CommonUsages.secondaryButton);
+            bool pressedThisFrame = pressed && !_wasXRCancelPressed;
+            _wasXRCancelPressed = pressed;
+            return pressedThisFrame;
+        }
+
+        private static bool TryGetXRButton(InputFeatureUsage<bool> usage)
+        {
+            _inputDevices.Clear();
+            InputDevices.GetDevicesWithCharacteristics(
+                InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller,
+                _inputDevices);
+
+            foreach (InputDevice device in _inputDevices)
+            {
+                if (device.isValid && device.TryGetFeatureValue(usage, out bool pressed) && pressed)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

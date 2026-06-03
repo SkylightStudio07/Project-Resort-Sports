@@ -37,11 +37,26 @@ namespace ResortSports.Jogging
         [Header("State (read-only)")]
         [SerializeField] private float _distance;
         [SerializeField] private float _speed;
+        [SerializeField] private bool _isRunning;
 
+        public bool IsRunning => _isRunning;
+        public Transform XrOrigin => xrOrigin;
         public float CurrentSpeed => _speed;
         public float CurrentDistance => _distance;
         public float NormalizedProgress =>
             track != null && track.TotalLength > 0f ? Mathf.Clamp01(_distance / track.TotalLength) : 0f;
+
+        public void BeginRun()
+        {
+            _isRunning = true;
+            ResetToStart();
+        }
+
+        public void StopRun()
+        {
+            _isRunning = false;
+            _speed = 0f;
+        }
 
         public void ResetToStart()
         {
@@ -57,6 +72,7 @@ namespace ResortSports.Jogging
 
         private void Update()
         {
+            if (!_isRunning) return;
             if (track == null || xrOrigin == null) return;
 
             float intensity = input != null ? input.Intensity : 0f;
