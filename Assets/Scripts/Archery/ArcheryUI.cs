@@ -16,6 +16,13 @@ public class ArcheryUI : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private ArcheryGameManager gameManager;
 
+    private Canvas canvas;
+
+    private void Awake()
+    {
+        canvas = GetComponent<Canvas>();
+    }
+
     private void Start()
     {
         if (finalScorePanel != null)
@@ -37,7 +44,7 @@ public class ArcheryUI : MonoBehaviour
 
     public void HideAll()
     {
-        if (hudWindow != null) hudWindow.SetActive(false);
+        if (canvas != null) canvas.enabled = false;
         if (finalScorePanel != null) finalScorePanel.SetActive(false);
     }
 
@@ -55,8 +62,8 @@ public class ArcheryUI : MonoBehaviour
         if (finalScorePanel == null) return;
         if (finalScoreText != null)
             finalScoreText.text = $"Final Score    {total}";
-        if (hudWindow != null)
-            hudWindow.SetActive(false);
+        if (hudWindow != null) hudWindow.SetActive(false);
+        if (canvas != null) canvas.enabled = true;
         finalScorePanel.SetActive(true);
     }
 }

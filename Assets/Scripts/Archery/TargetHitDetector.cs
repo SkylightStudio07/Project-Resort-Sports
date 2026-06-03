@@ -16,6 +16,12 @@ public class TargetHitDetector : MonoBehaviour
     [SerializeField] private AudioClip greatClip;
     [SerializeField] private AudioClip perfectClip;
 
+    private void Awake()
+    {
+        if (gameManager == null)
+            gameManager = FindObjectOfType<ArcheryGameManager>();
+    }
+
     public void RegisterHit(Vector3 hitWorldPos)
     {
         Vector3 localHit = transform.InverseTransformPoint(hitWorldPos);

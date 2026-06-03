@@ -17,6 +17,12 @@ public class ArrowSpawner : MonoBehaviour
 
     public float MaxForce => maxForce;
 
+    private void Awake()
+    {
+        if (gameManager == null)
+            gameManager = FindObjectOfType<ArcheryGameManager>();
+    }
+
     public void SpawnArrow()
     {
         if (currentArrow != null)
