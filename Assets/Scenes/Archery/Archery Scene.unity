@@ -815,7 +815,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3d945ada4e7ebe4fb9118398c3fb33d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localOffset: {x: 0, y: 0.1, z: 2}
+  localOffset: {x: 0, y: 0, z: 4}
   canvasScale: 0.005
 --- !u!1001 &622130037
 PrefabInstance:
