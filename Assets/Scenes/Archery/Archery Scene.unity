@@ -1153,7 +1153,7 @@ MonoBehaviour:
   gameManager: {fileID: 713807153}
   arrowPrefab: {fileID: 4044827680331071211, guid: 6b6e01fd63345814390aabdb8cfdc33d, type: 3}
   nockingPoint: {fileID: 2045624899}
-  maxForce: 60
+  maxForce: 40
 --- !u!114 &622130040
 MonoBehaviour:
   m_ObjectHideFlags: 0
