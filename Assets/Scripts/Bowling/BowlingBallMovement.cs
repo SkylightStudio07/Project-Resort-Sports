@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -30,6 +31,13 @@ public class BowlingBallMovement : MonoBehaviour
 
     [Tooltip("레인 방향 (볼이 굴러갈 forward 기준 오브젝트)")]
     public Transform laneForwardReference;
+
+    [Header("볼 리턴 연출")]
+    [Tooltip("볼 리턴 기계 안쪽 시작점 (공이 여기서 등장)")]
+    public Transform returnStartPoint;
+
+    [Tooltip("기계에서 스폰포인트까지 굴러오는 시간 (초)")]
+    public float returnRollDuration = 1.2f;
 
     public BallManager ballManager;
 
@@ -192,16 +200,65 @@ public class BowlingBallMovement : MonoBehaviour
         grab.enabled = enabled;
     }
 
-    /// <summary>BallManager에서 볼 복귀 시 호출합니다.</summary>
+    /// <summary>
+    /// BallManager에서 볼 복귀 시 호출합니다.
+    /// 기계 안쪽(returnStartPoint)에서 스폰포인트까지 굴러오는 연출을 재생합니다.
+    /// </summary>
     public void ReturnToSpawn(Transform spawnPoint)
     {
-        rb.velocity  = Vector3.zero;
+        StopAllCoroutines();
+        StartCoroutine(RollFromMachine(spawnPoint));
+    }
+
+    private IEnumerator RollFromMachine(Transform spawnPoint)
+    {
+        // 물리 비활성화 (코루틴이 위치를 직접 제어)
+        rb.velocity        = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic     = true;
 
-        transform.position = spawnPoint.position;
-        transform.rotation = spawnPoint.rotation;
+        // returnStartPoint가 없으면 기존처럼 즉시 스폰
+        if (returnStartPoint == null)
+        {
+            transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
+            rb.isKinematic = false;
+            yield break;
+        }
 
+        // 기계 안쪽에서 등장
+        Vector3 startPos = returnStartPoint.position;
+        Vector3 endPos   = spawnPoint.position;
+        transform.position = startPos;
+
+        // 굴러가는 방향 (시작 → 끝)
+        Vector3 rollDir  = (endPos - startPos).normalized;
+        // 굴림축 = 진행 방향과 수직 (오른쪽 축 기준 회전)
+        Vector3 rollAxis = Vector3.Cross(Vector3.up, rollDir);
+        float   distance = Vector3.Distance(startPos, endPos);
+        // 공 반지름 추정 (회전량 계산용)
+        float   radius   = transform.localScale.x * 0.5f;
+        if (radius < 0.01f) radius = 0.1f;
+
+        float t = 0f;
+        while (t < returnRollDuration)
+        {
+            t += Time.deltaTime;
+            float p = Mathf.Clamp01(t / returnRollDuration);
+            // EaseOut (끝에서 부드럽게 멈춤)
+            float eased = 1f - Mathf.Pow(1f - p, 2f);
+
+            // 위치 보간
+            transform.position = Vector3.Lerp(startPos, endPos, eased);
+
+            // 굴러가는 회전 연출
+            float angle = (distance * eased) / radius * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(angle, rollAxis) * spawnPoint.rotation;
+
+            yield return null;
+        }
+
+        // 최종 위치/회전 고정
+        transform.SetPositionAndRotation(spawnPoint.position, spawnPoint.rotation);
         rb.isKinematic = false;
     }
 }

@@ -2,17 +2,9 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Strike / Spare / Gutter 알림 UI입니다 (이미지 방식).
-/// 레인 중앙 상단 World Space Canvas에 배치합니다.
-/// 스프라이트가 확대되며 등장(오버슈트)했다가 페이드 아웃됩니다.
-///
-/// [Unity 씬 설정]
-/// 1. 레인 위에 빈 오브젝트 생성 → Canvas (World Space) 추가
-/// 2. 캔버스 아래 Image 하나 배치 (알림 이미지가 표시될 곳)
-/// 3. 캔버스에 CanvasGroup 컴포넌트 추가
-/// 4. 이 스크립트 부착 후 슬롯 + 스프라이트 3개 연결
-/// </summary>
+// Strike / Spare / Gutter 알림 UI입니다 (이미지 방식).
+// 레인 중앙 상단 World Space Canvas에 배치합니다.
+// 스프라이트가 확대되며 등장(오버슈트)했다가 페이드 아웃됩니다.
 public class NotificationUI : MonoBehaviour
 {
     [Header("UI 컴포넌트")]
