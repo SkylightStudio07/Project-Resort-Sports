@@ -92,7 +92,6 @@ public class PullInteraction : MonoBehaviour
         pullAmount = Mathf.Clamp01(distance / maxPullDistance);
         bow.UpdateString(pullAmount);
 
-        // 당기는 강도에 비례해서 진동 세기 증가
         var device = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         device.SendHapticImpulse(0, pullAmount * maxHapticAmplitude, Time.deltaTime);
     }
