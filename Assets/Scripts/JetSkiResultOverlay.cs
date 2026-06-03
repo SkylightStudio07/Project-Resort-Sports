@@ -30,6 +30,7 @@ public class JetSkiResultOverlay : MonoBehaviour
 
     [Header("Hub World")]
     public string hubWorldSceneName = "HubWorld";
+    public bool loadHubSceneOnReturn = true;
 
     [Header("Local Placement")]
     public Vector3 localPosition = new Vector3(0f, 1.08f, 1.65f);
@@ -239,13 +240,26 @@ public class JetSkiResultOverlay : MonoBehaviour
     {
         ResolveReferences();
 
+        if (loadHubSceneOnReturn)
+        {
+            LoadHubScene();
+            return;
+        }
+
         if (sessionManager != null)
         {
             Hide();
+            if (!string.IsNullOrWhiteSpace(hubWorldSceneName))
+                sessionManager.hubWorldSceneName = hubWorldSceneName;
             sessionManager.ReturnToHubWorld();
             return;
         }
 
+        LoadHubScene();
+    }
+
+    private void LoadHubScene()
+    {
         if (string.IsNullOrWhiteSpace(hubWorldSceneName))
         {
             Debug.LogWarning("[JetSkiResultOverlay] Hub world scene name is empty.");
@@ -315,7 +329,7 @@ public class JetSkiResultOverlay : MonoBehaviour
                 sessionManager.gameStartPosition = gameStartPosition;
             if (sessionManager.respawnTarget == null)
                 sessionManager.respawnTarget = respawnTarget;
-            if (string.IsNullOrWhiteSpace(sessionManager.hubWorldSceneName))
+            if (!string.IsNullOrWhiteSpace(hubWorldSceneName))
                 sessionManager.hubWorldSceneName = hubWorldSceneName;
         }
     }
