@@ -15,6 +15,15 @@ namespace ResortSports.Jogging
     public class JoggingGameManager : MonoBehaviour
     {
         public enum GameState { Idle, Running, Finished }
+        public enum XRButtonUsage
+        {
+            TriggerButton,
+            GripButton,
+            MenuButton,
+            Primary2DAxisClick,
+            PrimaryButton,
+            SecondaryButton
+        }
 
         [Header("Wiring")]
         public JogTrack track;
@@ -40,15 +49,17 @@ namespace ResortSports.Jogging
         public bool allowKeyboardStart = true;
         public KeyCode keyboardStartKey = KeyCode.E;
 
-        [Tooltip("VR 컨트롤러 Primary Button(A/X 등)으로 시작합니다.")]
+        [Tooltip("VR 컨트롤러 입력으로 시작합니다. Vive wand는 기본적으로 Trigger Button을 사용합니다.")]
         public bool allowXRStart = true;
+        public XRButtonUsage xrStartButton = XRButtonUsage.TriggerButton;
 
         [Tooltip("러닝 중 키보드 포기 입력을 허용합니다.")]
         public bool allowKeyboardCancel = true;
         public KeyCode keyboardCancelKey = KeyCode.Escape;
 
-        [Tooltip("러닝 중 VR 컨트롤러 Secondary Button(B/Y 등)으로 포기합니다.")]
+        [Tooltip("러닝 중 VR 컨트롤러 입력으로 포기합니다. Vive wand는 기본적으로 Grip Button을 사용합니다.")]
         public bool allowXRCancel = true;
+        public XRButtonUsage xrCancelButton = XRButtonUsage.GripButton;
 
         [Header("Events")]
         public UnityEvent onStarted;
@@ -138,7 +149,7 @@ namespace ResortSports.Jogging
             if (allowKeyboardStart && Input.GetKeyDown(keyboardStartKey)) return true;
             if (!allowXRStart) return false;
 
-            bool pressed = TryGetXRButton(CommonUsages.primaryButton);
+            bool pressed = TryGetXRButton(ToFeatureUsage(xrStartButton));
             bool pressedThisFrame = pressed && !_wasXRStartPressed;
             _wasXRStartPressed = pressed;
             return pressedThisFrame;
@@ -149,10 +160,31 @@ namespace ResortSports.Jogging
             if (allowKeyboardCancel && Input.GetKeyDown(keyboardCancelKey)) return true;
             if (!allowXRCancel) return false;
 
-            bool pressed = TryGetXRButton(CommonUsages.secondaryButton);
+            bool pressed = TryGetXRButton(ToFeatureUsage(xrCancelButton));
             bool pressedThisFrame = pressed && !_wasXRCancelPressed;
             _wasXRCancelPressed = pressed;
             return pressedThisFrame;
+        }
+
+        private static InputFeatureUsage<bool> ToFeatureUsage(XRButtonUsage button)
+        {
+            switch (button)
+            {
+                case XRButtonUsage.TriggerButton:
+                    return CommonUsages.triggerButton;
+                case XRButtonUsage.GripButton:
+                    return CommonUsages.gripButton;
+                case XRButtonUsage.MenuButton:
+                    return CommonUsages.menuButton;
+                case XRButtonUsage.Primary2DAxisClick:
+                    return CommonUsages.primary2DAxisClick;
+                case XRButtonUsage.PrimaryButton:
+                    return CommonUsages.primaryButton;
+                case XRButtonUsage.SecondaryButton:
+                    return CommonUsages.secondaryButton;
+                default:
+                    return CommonUsages.triggerButton;
+            }
         }
 
         private static bool TryGetXRButton(InputFeatureUsage<bool> usage)
