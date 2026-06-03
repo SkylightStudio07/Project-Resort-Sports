@@ -8,15 +8,9 @@ public class ArcheryUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI arrowScoreText;
     [SerializeField] private TextMeshProUGUI arrowsText;
     [SerializeField] private TextMeshProUGUI totalScoreText;
-    [SerializeField] private TextMeshProUGUI finalScoreText;
 
     [Header("Settings")]
     [SerializeField] private ArcheryGameManager gameManager;
-
-    private void Start()
-    {
-        finalScoreText.gameObject.SetActive(false);
-    }
 
     public void UpdateUI()
     {
@@ -24,13 +18,5 @@ public class ArcheryUI : MonoBehaviour
         arrowScoreText.text = $"Score : {gameManager.LastArrowScore}";
         arrowsText.text = $"Arrows: {gameManager.ArrowsLeft}";
         totalScoreText.text = $"Total : {gameManager.TotalScore}";
-        finalScoreText.gameObject.SetActive(false);
     }
-
-    public void ShowFinalScore(int total)
-    {
-        finalScoreText.gameObject.SetActive(true);
-        finalScoreText.text = $"Final Score: {total}";
-    }
-
 }

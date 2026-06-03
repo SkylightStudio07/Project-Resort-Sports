@@ -86,7 +86,6 @@ public class ArcheryGameManager : MonoBehaviour
         if (CurrentSet >= setConfigs.Length)
         {
             State = GameState.GameOver;
-            ui.ShowFinalScore(TotalScore);
             Invoke(nameof(Restart), 5f);
             return;
         }
