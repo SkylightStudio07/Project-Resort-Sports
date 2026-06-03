@@ -84,6 +84,8 @@ public class ArcheryGameManager : MonoBehaviour
 
     public void ActivateHUD()
     {
+        if (State == GameState.Idle)
+            StartGame();
         ui.ShowHUD();
         ui.UpdateUI();
     }
