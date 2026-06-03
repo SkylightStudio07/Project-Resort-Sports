@@ -2,7 +2,8 @@
     "name": "ResortSports.Jogging",
     "rootNamespace": "ResortSports.Jogging",
     "references": [
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

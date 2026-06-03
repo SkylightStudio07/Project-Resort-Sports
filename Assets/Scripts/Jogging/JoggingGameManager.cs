@@ -2,7 +2,12 @@ using ResortSports.Jogging;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.XR;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using XRCommonUsages = UnityEngine.XR.CommonUsages;
+using XRInputDevice = UnityEngine.XR.InputDevice;
+using XRInputDevices = UnityEngine.XR.InputDevices;
+using XRInputFeatureUsageBool = UnityEngine.XR.InputFeatureUsage<bool>;
 
 namespace ResortSports.Jogging
 {
@@ -47,7 +52,7 @@ namespace ResortSports.Jogging
 
         [Tooltip("테스트용 키보드 시작 입력을 허용합니다.")]
         public bool allowKeyboardStart = true;
-        public KeyCode keyboardStartKey = KeyCode.E;
+        public Key keyboardStartKey = Key.E;
 
         [Tooltip("VR 컨트롤러 입력으로 시작합니다. Vive wand는 기본적으로 Trigger Button을 사용합니다.")]
         public bool allowXRStart = true;
@@ -55,7 +60,7 @@ namespace ResortSports.Jogging
 
         [Tooltip("러닝 중 키보드 포기 입력을 허용합니다.")]
         public bool allowKeyboardCancel = true;
-        public KeyCode keyboardCancelKey = KeyCode.Escape;
+        public Key keyboardCancelKey = Key.Escape;
 
         [Tooltip("러닝 중 VR 컨트롤러 입력으로 포기합니다. Vive wand는 기본적으로 Grip Button을 사용합니다.")]
         public bool allowXRCancel = true;
@@ -73,7 +78,7 @@ namespace ResortSports.Jogging
         private float _goalDistance;
         private bool _wasXRStartPressed;
         private bool _wasXRCancelPressed;
-        private static readonly List<InputDevice> _inputDevices = new List<InputDevice>();
+        private static readonly List<XRInputDevice> _inputDevices = new List<XRInputDevice>();
 
         private void Start()
         {
@@ -146,7 +151,7 @@ namespace ResortSports.Jogging
 
         private bool IsStartPressed()
         {
-            if (allowKeyboardStart && Input.GetKeyDown(keyboardStartKey)) return true;
+            if (allowKeyboardStart && WasKeyboardKeyPressed(keyboardStartKey)) return true;
             if (!allowXRStart) return false;
 
             bool pressed = TryGetXRButton(ToFeatureUsage(xrStartButton));
@@ -157,7 +162,7 @@ namespace ResortSports.Jogging
 
         private bool IsCancelPressed()
         {
-            if (allowKeyboardCancel && Input.GetKeyDown(keyboardCancelKey)) return true;
+            if (allowKeyboardCancel && WasKeyboardKeyPressed(keyboardCancelKey)) return true;
             if (!allowXRCancel) return false;
 
             bool pressed = TryGetXRButton(ToFeatureUsage(xrCancelButton));
@@ -166,35 +171,44 @@ namespace ResortSports.Jogging
             return pressedThisFrame;
         }
 
-        private static InputFeatureUsage<bool> ToFeatureUsage(XRButtonUsage button)
+        private static bool WasKeyboardKeyPressed(Key key)
+        {
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null) return false;
+
+            KeyControl keyControl = keyboard[key];
+            return keyControl != null && keyControl.wasPressedThisFrame;
+        }
+
+        private static XRInputFeatureUsageBool ToFeatureUsage(XRButtonUsage button)
         {
             switch (button)
             {
                 case XRButtonUsage.TriggerButton:
-                    return CommonUsages.triggerButton;
+                    return XRCommonUsages.triggerButton;
                 case XRButtonUsage.GripButton:
-                    return CommonUsages.gripButton;
+                    return XRCommonUsages.gripButton;
                 case XRButtonUsage.MenuButton:
-                    return CommonUsages.menuButton;
+                    return XRCommonUsages.menuButton;
                 case XRButtonUsage.Primary2DAxisClick:
-                    return CommonUsages.primary2DAxisClick;
+                    return XRCommonUsages.primary2DAxisClick;
                 case XRButtonUsage.PrimaryButton:
-                    return CommonUsages.primaryButton;
+                    return XRCommonUsages.primaryButton;
                 case XRButtonUsage.SecondaryButton:
-                    return CommonUsages.secondaryButton;
+                    return XRCommonUsages.secondaryButton;
                 default:
-                    return CommonUsages.triggerButton;
+                    return XRCommonUsages.triggerButton;
             }
         }
 
-        private static bool TryGetXRButton(InputFeatureUsage<bool> usage)
+        private static bool TryGetXRButton(XRInputFeatureUsageBool usage)
         {
             _inputDevices.Clear();
-            InputDevices.GetDevicesWithCharacteristics(
-                InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller,
+            XRInputDevices.GetDevicesWithCharacteristics(
+                UnityEngine.XR.InputDeviceCharacteristics.HeldInHand | UnityEngine.XR.InputDeviceCharacteristics.Controller,
                 _inputDevices);
 
-            foreach (InputDevice device in _inputDevices)
+            foreach (XRInputDevice device in _inputDevices)
             {
                 if (device.isValid && device.TryGetFeatureValue(usage, out bool pressed) && pressed)
                     return true;
