@@ -32,6 +32,9 @@ public class GameResultUI : MonoBehaviour
     [Tooltip("플레이어 앞 거리 (m)")]
     public float distanceFromPlayer = 2f;
 
+    [Tooltip("패널 높이 (눈높이 보정, m)")]
+    public float panelHeight = 1.5f;
+
     // ── Unity 생명주기 ───────────────────────────────────────────────────
 
     private void Start()
@@ -69,13 +72,16 @@ public class GameResultUI : MonoBehaviour
             };
         }
 
-        // 플레이어 앞에 패널 배치
+        // 플레이어 앞에 패널 배치 (눈높이 보정)
         if (playerTransform != null)
         {
             Vector3 forward = playerTransform.forward;
             forward.y       = 0f;
             forward.Normalize();
-            panel.transform.position = playerTransform.position + forward * distanceFromPlayer;
+
+            Vector3 pos = playerTransform.position + forward * distanceFromPlayer;
+            pos.y      += panelHeight; // 눈높이만큼 올림
+            panel.transform.position = pos;
             panel.transform.rotation = Quaternion.LookRotation(forward);
         }
     }
