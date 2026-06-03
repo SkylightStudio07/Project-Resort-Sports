@@ -20,6 +20,14 @@ public class ArcheryUI : MonoBehaviour
     {
         if (finalScorePanel != null)
             finalScorePanel.SetActive(false);
+        if (hudWindow != null)
+            hudWindow.SetActive(false);
+    }
+
+    public void ShowHUD()
+    {
+        if (hudWindow != null)
+            hudWindow.SetActive(true);
     }
 
     public void UpdateUI()
@@ -31,8 +39,6 @@ public class ArcheryUI : MonoBehaviour
         totalScoreText.text = $"Total    {gameManager.TotalScore}";
         if (finalScorePanel != null)
             finalScorePanel.SetActive(false);
-        if (hudWindow != null)
-            hudWindow.SetActive(true);
     }
 
     public void HideAll()

@@ -7849,6 +7849,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -6.196
       objectReference: {fileID: 0}
+    - target: {fileID: 4920168586729109182, guid: c207bc17fe35e954cb3c1b521f3d7d6d, type: 3}
+      propertyPath: gameManager
+      value: 
+      objectReference: {fileID: 514683283}
     - target: {fileID: 5208518208410474919, guid: c207bc17fe35e954cb3c1b521f3d7d6d, type: 3}
       propertyPath: m_text
       value: Game has over!
@@ -7944,6 +7948,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9039002969204838726, guid: c207bc17fe35e954cb3c1b521f3d7d6d, type: 3}
   m_PrefabInstance: {fileID: 514683281}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &514683283 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8146660805739741957, guid: c207bc17fe35e954cb3c1b521f3d7d6d, type: 3}
+  m_PrefabInstance: {fileID: 514683281}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d1a58c8c66343848b5f868c94dfe762, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &528577036
 GameObject:
   m_ObjectHideFlags: 0
