@@ -41,6 +41,7 @@ namespace ResortSports.Jogging
         private float _smoothedIntensity;
         private bool _initialized;
         private float _nextFootstepTime;
+        private int _lastFootstepClipIndex = -1;
 
         /// <summary>현재 정규화 흔들기 강도 (0~1+).</summary>
         public float Intensity => _smoothedIntensity;
@@ -93,11 +94,42 @@ namespace ResortSports.Jogging
 
             if (_smoothedIntensity < footstepIntensityThreshold || Time.time < _nextFootstepTime) return;
 
-            AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
+            int clipIndex = PickFootstepClipIndex();
+            if (clipIndex < 0) return;
+
+            AudioClip clip = footstepClips[clipIndex];
             if (clip == null) return;
 
             footstepAudioSource.PlayOneShot(clip, footstepVolume);
+            _lastFootstepClipIndex = clipIndex;
             _nextFootstepTime = Time.time + footstepMinInterval;
+        }
+
+        private int PickFootstepClipIndex()
+        {
+            int validCount = 0;
+            for (int i = 0; i < footstepClips.Length; i++)
+            {
+                if (footstepClips[i] != null) validCount++;
+            }
+
+            if (validCount == 0) return -1;
+            if (validCount == 1)
+            {
+                for (int i = 0; i < footstepClips.Length; i++)
+                {
+                    if (footstepClips[i] != null) return i;
+                }
+            }
+
+            int index;
+            do
+            {
+                index = Random.Range(0, footstepClips.Length);
+            }
+            while (footstepClips[index] == null || index == _lastFootstepClipIndex);
+
+            return index;
         }
     }
 }
