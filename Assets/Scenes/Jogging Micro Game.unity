@@ -379,7 +379,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 38515878}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -1254,7 +1254,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 247583035}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -1576,7 +1576,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 314673917}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -2111,7 +2111,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 406269043}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -2406,7 +2406,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 435505747}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -2582,7 +2582,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 460420757}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -2758,7 +2758,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 502330249}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -3275,7 +3275,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 614876502}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -3618,7 +3618,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 679497722}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -3794,7 +3794,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 681488914}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -4255,7 +4255,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 860580022}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -4431,7 +4431,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 864875054}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -4607,7 +4607,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 877372956}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -5480,7 +5480,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1100342908}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -5656,7 +5656,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1109686155}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -5906,7 +5906,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1116492910}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -6905,7 +6905,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1573994527}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -7091,7 +7091,7 @@ MonoBehaviour:
   targetDistance: 0
   autoStart: 0
   startInteractionPoint: {fileID: 0}
-  interactionDistance: 4.98
+  interactionDistance: 10
   allowKeyboardStart: 1
   keyboardStartKey: 19
   allowXRStart: 1
@@ -8045,7 +8045,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1853168541}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -8295,7 +8295,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 1932143480}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -8599,7 +8599,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 2004827324}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -8926,7 +8926,7 @@ MonoBehaviour:
   m_Colliders:
   - {fileID: 2076407372}
   m_InteractionLayers:
-    m_Bits: 1
+    m_Bits: 2147483648
   m_DistanceCalculationMode: 1
   m_SelectMode: 1
   m_FocusMode: 1
@@ -9101,7 +9101,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3000000001}
-  m_LocalRotation: {x: 0.04916143, y: 0.90015507, z: -0.105427064, w: 0.41974905}
+  m_LocalRotation: {x: 0.049161434, y: 0.90015507, z: -0.10542707, w: 0.41974905}
   m_LocalPosition: {x: 0, y: 0, z: -51.768463}
   m_LocalScale: {x: 0.0065, y: 0.0065, z: 0.0065}
   m_ConstrainProportionsScale: 1
