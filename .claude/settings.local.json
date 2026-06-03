@@ -4,7 +4,8 @@
       "Bash(xargs grep *)",
       "WebSearch",
       "WebFetch(domain:docs.unity3d.com)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(git add *)"
     ]
   }
 }
