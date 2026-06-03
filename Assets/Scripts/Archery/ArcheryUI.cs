@@ -14,9 +14,9 @@ public class ArcheryUI : MonoBehaviour
 
     public void UpdateUI()
     {
-        setText.text = $"Set {gameManager.CurrentSet + 1} / {gameManager.TotalSets}";
-        arrowScoreText.text = $"Score : {gameManager.LastArrowScore}";
-        arrowsText.text = $"Arrows: {gameManager.ArrowsLeft}";
-        totalScoreText.text = $"Total : {gameManager.TotalScore}";
+        setText.text = $"Round    {gameManager.CurrentSet + 1} / {gameManager.TotalSets}";
+        arrowScoreText.text = $"Score    {gameManager.LastArrowScore}";
+        arrowsText.text = $"Arrows    {gameManager.ArrowsLeft}";
+        totalScoreText.text = $"Total    {gameManager.TotalScore}";
     }
 }
