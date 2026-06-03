@@ -80,6 +80,12 @@ public class ArcheryGameManager : MonoBehaviour
 
     public void Restart() => StartGame();
 
+    public void ActivateHUD()
+    {
+        ui.ShowHUD();
+        ui.UpdateUI();
+    }
+
     public void StopGame()
     {
         CancelInvoke();
