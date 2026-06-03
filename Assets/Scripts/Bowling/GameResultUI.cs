@@ -1,7 +1,6 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 게임 종료 결과 화면 UI입니다.
@@ -9,28 +8,23 @@ using UnityEngine.SceneManagement;
 ///
 /// [Unity 씬 설정]
 /// 1. 빈 오브젝트에 Canvas (World Space) 추가 → 게임 시작 시 비활성화
-/// 2. 최종 점수, 랭크, 재도전/복귀 버튼 TextMeshPro 배치
+/// 2. 최종 점수, 랭크, 재도전 버튼 배치
 /// 3. 이 스크립트 부착 후 슬롯 연결
 /// 4. ScoreManager.OnGameOver 이벤트로 자동 표시됨
 /// </summary>
 public class GameResultUI : MonoBehaviour
 {
     [Header("UI 컴포넌트")]
-    public GameObject          panel;             // 결과 화면 패널 (시작 시 비활성화)
-    public TextMeshProUGUI     finalScoreText;
-    public TextMeshProUGUI     rankText;
+    public GameObject      panel;          // 결과 화면 패널 (시작 시 비활성화)
+    public TextMeshProUGUI finalScoreText;
+    public TextMeshProUGUI rankText;
 
     [Header("버튼")]
-    public Button retryButton;                    // 재도전
-    public Button returnToHubButton;              // 허브(중앙 광장) 복귀
+    public Button retryButton;             // 재도전
 
     [Header("참조")]
     public ScoreManager scoreManager;
     public BallManager  ballManager;
-
-    [Header("씬 설정")]
-    [Tooltip("허브 씬 이름")]
-    public string hubSceneName = "Hub";
 
     [Header("결과 화면 위치 설정")]
     [Tooltip("플레이어(XR Origin) Transform. 결과 화면이 플레이어 앞에 나타납니다.")]
@@ -47,7 +41,6 @@ public class GameResultUI : MonoBehaviour
         scoreManager.OnGameOver += ShowResult;
 
         retryButton?.onClick.AddListener(OnRetry);
-        returnToHubButton?.onClick.AddListener(OnReturnToHub);
     }
 
     private void OnDestroy()
@@ -79,8 +72,8 @@ public class GameResultUI : MonoBehaviour
         // 플레이어 앞에 패널 배치
         if (playerTransform != null)
         {
-            Vector3 forward    = playerTransform.forward;
-            forward.y          = 0f;
+            Vector3 forward = playerTransform.forward;
+            forward.y       = 0f;
             forward.Normalize();
             panel.transform.position = playerTransform.position + forward * distanceFromPlayer;
             panel.transform.rotation = Quaternion.LookRotation(forward);
@@ -93,10 +86,5 @@ public class GameResultUI : MonoBehaviour
     {
         panel.SetActive(false);
         ballManager.ResetGame();
-    }
-
-    private void OnReturnToHub()
-    {
-        SceneManager.LoadScene(hubSceneName);
     }
 }
