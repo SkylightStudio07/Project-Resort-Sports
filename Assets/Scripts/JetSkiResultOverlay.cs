@@ -740,9 +740,6 @@ public class JetSkiResultOverlay : MonoBehaviour
             if (ReadInputSystemButton(device, "gripPressed"))
                 return true;
 
-            if (ReadInputSystemButton(device, "grip"))
-                return true;
-
             if (ReadInputSystemAxis(device, "grip"))
                 return true;
         }
@@ -763,14 +760,28 @@ public class JetSkiResultOverlay : MonoBehaviour
 
     private bool ReadInputSystemButton(UnityEngine.InputSystem.InputDevice device, string controlName)
     {
-        var button = device.TryGetChildControl<ButtonControl>(controlName);
-        return button != null && button.isPressed;
+        try
+        {
+            var button = device.TryGetChildControl<ButtonControl>(controlName);
+            return button != null && button.isPressed;
+        }
+        catch (System.InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     private bool ReadInputSystemAxis(UnityEngine.InputSystem.InputDevice device, string controlName)
     {
-        var axis = device.TryGetChildControl<AxisControl>(controlName);
-        return axis != null && axis.ReadValue() >= gripAxisThreshold;
+        try
+        {
+            var axis = device.TryGetChildControl<AxisControl>(controlName);
+            return axis != null && axis.ReadValue() >= gripAxisThreshold;
+        }
+        catch (System.InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     private void EnableGripActions()
