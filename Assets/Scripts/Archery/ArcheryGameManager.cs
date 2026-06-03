@@ -80,6 +80,12 @@ public class ArcheryGameManager : MonoBehaviour
 
     public void Restart() => StartGame();
 
+    public void StopGame()
+    {
+        CancelInvoke();
+        State = GameState.Idle;
+    }
+
     private void NextSet()
     {
         CurrentSet++;

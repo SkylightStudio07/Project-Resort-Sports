@@ -40,6 +40,8 @@ public class BowController : MonoBehaviour
     private bool prevTriggerDown = false;
     private float pullAmount = 0f;
     private float chargeStartTime;
+    private Vector3 spawnPosition;
+    private Quaternion spawnRotation;
 
     private const float TriggerThreshold = 0.1f;
 
@@ -51,6 +53,8 @@ public class BowController : MonoBehaviour
         grabInteractable = GetComponent<XRGrabInteractable>();
         arrowSpawner = GetComponent<ArrowSpawner>();
         mainCamera = Camera.main;
+        spawnPosition = transform.position;
+        spawnRotation = transform.rotation;
 
         grabInteractable.trackPosition = false;
         grabInteractable.trackRotation = false;
@@ -201,5 +205,19 @@ public class BowController : MonoBehaviour
     {
         if (wbStringBone == null) return;
         wbStringBone.localPosition = defaultStringPos + new Vector3(0f, 0f, pull * pullOffset);
+    }
+
+    public void ResetState()
+    {
+        isHeld = false;
+        isDrawing = false;
+        pullAmount = 0f;
+        prevTriggerDown = false;
+        UpdateString(0f);
+        if (aimCrosshair != null) aimCrosshair.gameObject.SetActive(false);
+        arrowSpawner.CancelArrow();
+
+        transform.SetPositionAndRotation(spawnPosition, spawnRotation);
+        grabInteractable.enabled = true;
     }
 }
