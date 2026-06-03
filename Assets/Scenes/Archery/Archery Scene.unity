@@ -958,9 +958,8 @@ MonoBehaviour:
   leftHandPositionOffset: {x: 0, y: 0, z: -0.1}
   leftHandRotationOffset: {x: 0, y: -90, z: -70}
   aimCrosshair: {fileID: 1395587277}
-  aimLine: {fileID: 0}
   aimMaxDistance: 50
-  previewMaxForce: 30
+  maxChargeTime: 3
   maxHapticAmplitude: 0.6
   audioSource: {fileID: 622130048}
   drawClip: {fileID: 8300000, guid: c229f00c7e775b54c90fb23dd9717b9e, type: 3}

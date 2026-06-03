@@ -15,9 +15,10 @@ public class BowController : MonoBehaviour
 
     [Header("Aim Crosshair")]
     [SerializeField] private Transform aimCrosshair;
-    [SerializeField] private LineRenderer aimLine;
     [SerializeField] private float aimMaxDistance = 50f;
-    [SerializeField] private float previewMaxForce = 30f;
+
+    [Header("Charge Settings")]
+    [SerializeField] private float maxChargeTime = 1.5f;
 
     [Header("Haptic")]
     [SerializeField] private float maxHapticAmplitude = 0.6f;
@@ -38,7 +39,7 @@ public class BowController : MonoBehaviour
     private bool isDrawing = false;
     private bool prevTriggerDown = false;
     private float pullAmount = 0f;
-    private float peakPullAmount = 0f;
+    private float chargeStartTime;
 
     private const float TriggerThreshold = 0.1f;
 
@@ -61,7 +62,6 @@ public class BowController : MonoBehaviour
         UpdateString(0f);
 
         if (aimCrosshair != null) aimCrosshair.gameObject.SetActive(false);
-        if (aimLine != null) aimLine.enabled = false;
     }
 
     private void OnGrabbed(SelectEnterEventArgs args)
@@ -92,8 +92,7 @@ public class BowController : MonoBehaviour
 
         if (isDrawing)
         {
-            pullAmount = triggerValue;
-            peakPullAmount = Mathf.Max(peakPullAmount, pullAmount);
+            pullAmount = Mathf.Clamp01((Time.time - chargeStartTime) / maxChargeTime);
             UpdateString(pullAmount);
             rightHand.SendHapticImpulse(0, pullAmount * maxHapticAmplitude, Time.deltaTime);
         }
@@ -124,50 +123,25 @@ public class BowController : MonoBehaviour
 
     private void UpdateAimCrosshair()
     {
-        if (aimCrosshair == null && aimLine == null) return;
+        if (aimCrosshair == null) return;
 
-        // 풀 차징 기준 포물선 탄착점 예측
-        Vector3 pos = nockingPoint.position;
-        Vector3 vel = transform.right * previewMaxForce;
-        float timeStep = 0.05f;
-        Vector3 hitPoint = pos + transform.right * aimMaxDistance;
+        Vector3 origin = nockingPoint.position;
+        Vector3 direction = transform.right;
 
-        for (int i = 0; i < 120; i++)
-        {
-            Vector3 nextPos = pos + vel * timeStep;
-            vel += Physics.gravity * timeStep;
+        Vector3 hitPoint = Physics.Raycast(origin, direction, out RaycastHit hit, aimMaxDistance)
+            ? hit.point
+            : origin + direction * aimMaxDistance;
 
-            if (Physics.Raycast(pos, nextPos - pos, out RaycastHit hit, Vector3.Distance(pos, nextPos)))
-            {
-                hitPoint = hit.point;
-                break;
-            }
-
-            pos = nextPos;
-            hitPoint = pos;
-        }
-
-        if (aimCrosshair != null)
-        {
-            aimCrosshair.position = hitPoint;
-            aimCrosshair.rotation = Quaternion.LookRotation(mainCamera.transform.position - hitPoint);
-            aimCrosshair.gameObject.SetActive(true);
-        }
-
-        if (aimLine != null)
-        {
-            aimLine.positionCount = 2;
-            aimLine.enabled = true;
-            aimLine.SetPosition(0, nockingPoint.position);
-            aimLine.SetPosition(1, hitPoint);
-        }
+        aimCrosshair.position = hitPoint;
+        aimCrosshair.rotation = Quaternion.LookRotation(mainCamera.transform.position - hitPoint);
+        aimCrosshair.gameObject.SetActive(true);
     }
 
     private void OnTriggerPressed()
     {
         if (isDrawing) return;
         isDrawing = true;
-        peakPullAmount = 0f;
+        chargeStartTime = Time.time;
         arrowSpawner.SpawnArrow();
 
         if (audioSource != null && drawClip != null)
@@ -185,17 +159,12 @@ public class BowController : MonoBehaviour
         if (audioSource != null)
             audioSource.Stop();
 
-        if (peakPullAmount > TriggerThreshold)
-        {
-            if (audioSource != null && fireClip != null)
-                audioSource.PlayOneShot(fireClip);
-            arrowSpawner.FireArrow(peakPullAmount);
-        }
-        else
-            arrowSpawner.CancelArrow();
+        if (audioSource != null && fireClip != null)
+            audioSource.PlayOneShot(fireClip);
+
+        arrowSpawner.FireArrow(pullAmount);
 
         pullAmount = 0f;
-        peakPullAmount = 0f;
         isDrawing = false;
         UpdateString(0f);
     }
