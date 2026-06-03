@@ -41,6 +41,7 @@ public class NotificationUI : MonoBehaviour
 
     // ── 내부 상태 ────────────────────────────────────────────────────────
     private Coroutine _currentCoroutine;
+    private Vector3 _initScale;
 
     // ── Unity 생명주기 ───────────────────────────────────────────────────
 
@@ -51,6 +52,7 @@ public class NotificationUI : MonoBehaviour
         ballManager.OnGutterBall += HandleGutter;
 
         canvasGroup.alpha = 0f;
+        _initScale = transform.localScale;
     }
 
     private void OnDestroy()
@@ -87,7 +89,7 @@ public class NotificationUI : MonoBehaviour
     {
         // ── 등장: startScale → overshootScale (확대) ────────────────────
         float t = 0f;
-        transform.localScale = Vector3.one * startScale;
+        transform.localScale = _initScale * startScale;
         canvasGroup.alpha    = 0f;
 
         while (t < popInDuration)
@@ -97,7 +99,7 @@ public class NotificationUI : MonoBehaviour
             // EaseOut 곡선 (빠르게 커졌다 느려짐)
             float eased          = 1f - Mathf.Pow(1f - p, 3f);
             canvasGroup.alpha    = p;
-            transform.localScale = Vector3.one * Mathf.Lerp(startScale, overshootScale, eased);
+            transform.localScale = _initScale * Mathf.Lerp(startScale, overshootScale, eased);
             yield return null;
         }
 
@@ -106,12 +108,12 @@ public class NotificationUI : MonoBehaviour
         while (t < settleDuration)
         {
             t += Time.deltaTime;
-            transform.localScale = Vector3.one * Mathf.Lerp(overshootScale, 1f, t / settleDuration);
+            transform.localScale = _initScale * Mathf.Lerp(overshootScale, 1f, t / settleDuration);
             yield return null;
         }
 
         canvasGroup.alpha    = 1f;
-        transform.localScale = Vector3.one;
+        transform.localScale = _initScale;
 
         // ── 유지 ────────────────────────────────────────────────────────
         yield return new WaitForSeconds(displayDuration);
