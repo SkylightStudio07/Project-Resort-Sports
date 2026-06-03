@@ -116,6 +116,7 @@ public class BallManager : MonoBehaviour
         StopAllCoroutines();
         _ballInFlight    = false;
         _gutterThisThrow = false;
+        _isProcessing    = false;
 
         scoreManager.ResetGame();
         pinManager.ResetAllPins();
