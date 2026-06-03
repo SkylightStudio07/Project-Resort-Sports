@@ -20,6 +20,9 @@ public class BowController : MonoBehaviour
     [Header("Charge Settings")]
     [SerializeField] private float maxChargeTime = 1.5f;
 
+    [Header("References")]
+    [SerializeField] private ArcheryGameManager gameManager;
+
     [Header("Haptic")]
     [SerializeField] private float maxHapticAmplitude = 0.6f;
 
@@ -75,6 +78,7 @@ public class BowController : MonoBehaviour
         isHeld = true;
         rb.isKinematic = true;
         grabInteractable.enabled = false;
+        gameManager?.ActivateHUD();
     }
 
     private void Update()
