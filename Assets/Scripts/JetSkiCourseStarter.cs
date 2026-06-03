@@ -11,18 +11,25 @@ public class JetSkiCourseStarter : MonoBehaviour
     [Tooltip("true: 제트스키가 이 오브젝트의 트리거에 진입하면 자동 시작.")]
     public bool autoStartOnTrigger = true;
     public bool ignoreIfRunning = true;
+    public bool waitForExitAfterRetry = true;
+    public float retryAutoStartBlockSeconds = 1f;
 
     [Header("이벤트 (선택)")]
     public UnityEvent onCourseStart;
     public UnityEvent onCourseReset;
 
     private JetSkiScoreManager scoreManager;
+    private bool waitingForJetSkiExit;
+    private Collider triggerCollider;
+    private float blockAutoStartUntil;
 
     void Start()
     {
         scoreManager = JetSkiScoreManager.Instance;
         if (scoreManager != null)
             scoreManager.onGameOver.AddListener(OnGameOver);
+
+        triggerCollider = GetComponent<Collider>();
 
         CollectGatesIfEmpty();
 
@@ -42,7 +49,17 @@ public class JetSkiCourseStarter : MonoBehaviour
     {
         if (!autoStartOnTrigger) return;
         if (other.GetComponentInParent<JetSkiController>() == null) return;
+        if (Time.time < blockAutoStartUntil) return;
+        if (waitingForJetSkiExit) return;
         StartCourse();
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (!waitingForJetSkiExit) return;
+        if (other.GetComponentInParent<JetSkiController>() == null) return;
+
+        waitingForJetSkiExit = false;
     }
 
     public void StartCourse()
@@ -65,6 +82,34 @@ public class JetSkiCourseStarter : MonoBehaviour
     {
         ResetAllGates();
         onCourseReset?.Invoke();
+    }
+
+    public void PrepareRetry(Transform jetSkiTransform)
+    {
+        ResetCourse();
+
+        blockAutoStartUntil = Time.time + Mathf.Max(0f, retryAutoStartBlockSeconds);
+        waitingForJetSkiExit = waitForExitAfterRetry && IsInsideStartTrigger(jetSkiTransform);
+    }
+
+    bool IsInsideStartTrigger(Transform target)
+    {
+        if (target == null) return false;
+
+        if (triggerCollider == null)
+            triggerCollider = GetComponent<Collider>();
+
+        if (triggerCollider == null) return false;
+        foreach (var jetSkiCollider in target.GetComponentsInChildren<Collider>())
+        {
+            if (jetSkiCollider == null || jetSkiCollider == triggerCollider)
+                continue;
+
+            if (triggerCollider.bounds.Intersects(jetSkiCollider.bounds))
+                return true;
+        }
+
+        return triggerCollider.bounds.Contains(target.position);
     }
 
     void ResetAllGates()

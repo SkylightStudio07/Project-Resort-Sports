@@ -1,48 +1,98 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-/// <summary>
-/// 제트스키 코스의 타이머·점수·콤보·게임 오버를 관리.
-/// 씬에 하나만 배치. GateController들이 이 매니저에 이벤트를 보냄.
-/// </summary>
 public class JetSkiScoreManager : MonoBehaviour
 {
     public static JetSkiScoreManager Instance { get; private set; }
 
-    [Header("코스 데이터")]
+    [Header("Course Data")]
     public JetSkiActivityData activityData;
 
-    [Header("이벤트")]
-    [Tooltip("점수·콤보 변경 시 (score, combo)")]
+    [Header("Tutorial")]
+    public bool showTutorialOnStart = true;
+    public bool autoFindTutorialOverlay = true;
+    public JetSkiTutorialOverlay tutorialOverlay;
+
+    [Header("Events")]
+    [Tooltip("Invoked when score or combo changes. Args: score, combo.")]
     public UnityEvent<int, int> onScoreChanged;
-    [Tooltip("타이머 갱신 시 (remainingTime)")]
+    [Tooltip("Invoked every timer tick. Arg: remaining time.")]
     public UnityEvent<float> onTimerTick;
-    [Tooltip("게임 오버 / 완주 시 (finalScore, rank)")]
+    [Tooltip("Invoked when the course ends. Args: final score, rank.")]
     public UnityEvent<int, string> onGameOver;
 
-    public int   Score         { get; private set; }
-    public int   Combo         { get; private set; }
+    public int Score { get; private set; }
+    public int Combo { get; private set; }
     public float RemainingTime { get; private set; }
-    public bool  IsRunning     { get; private set; }
+    public bool IsRunning { get; private set; }
 
     private int totalGates;
     private int passedGates;
 
     void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
     }
 
-    /// <summary>게이트 수를 넘겨서 코스를 시작.</summary>
+    void Start()
+    {
+        ResolveTutorialOverlay();
+
+        if (showTutorialOnStart && tutorialOverlay != null)
+            tutorialOverlay.Show();
+    }
+
     public void StartCourse(int gateCount)
     {
-        totalGates  = gateCount;
+        ResolveTutorialOverlay();
+
+        if (tutorialOverlay != null)
+            tutorialOverlay.HideForCourseStart();
+
+        totalGates = gateCount;
         passedGates = 0;
-        Score       = 0;
-        Combo       = 0;
-        IsRunning   = true;
+        Score = 0;
+        Combo = 0;
+        IsRunning = true;
         RemainingTime = activityData != null ? activityData.defaultGateTime : 5.9f;
+    }
+
+    public void ResetForRetry(bool showTutorial = true)
+    {
+        ResolveTutorialOverlay();
+
+        totalGates = 0;
+        passedGates = 0;
+        Score = 0;
+        Combo = 0;
+        IsRunning = false;
+        RemainingTime = activityData != null ? activityData.defaultGateTime : 5.9f;
+
+        onScoreChanged?.Invoke(Score, Combo);
+        onTimerTick?.Invoke(RemainingTime);
+
+        if (showTutorial && tutorialOverlay != null)
+            tutorialOverlay.Show();
+    }
+
+    void ResolveTutorialOverlay()
+    {
+        if (tutorialOverlay == null && autoFindTutorialOverlay)
+            tutorialOverlay = FindAnyObjectByType<JetSkiTutorialOverlay>();
+
+        if (tutorialOverlay == null)
+            return;
+
+        tutorialOverlay.manager = this;
+
+        if (tutorialOverlay.activityData == null)
+            tutorialOverlay.activityData = activityData;
     }
 
     void Update()
@@ -59,7 +109,6 @@ public class JetSkiScoreManager : MonoBehaviour
         }
     }
 
-    /// <summary>GateController가 통과 시 호출.</summary>
     public void GatePassed(float remainingTime, bool isPerfect)
     {
         if (!IsRunning) return;
@@ -67,11 +116,12 @@ public class JetSkiScoreManager : MonoBehaviour
         passedGates++;
         Combo++;
 
-        // 점수 = 기본 점수 + 잔여 시간 × 10 (+ 퍼펙트 보너스)
-        int bonus    = activityData != null ? activityData.defaultPerfectBonus : 50;
-        int base_    = activityData != null ? activityData.defaultBaseScore    : 100;
-        int earned   = base_ + Mathf.RoundToInt(remainingTime * 10f);
-        if (isPerfect) earned += bonus;
+        int bonus = activityData != null ? activityData.defaultPerfectBonus : 50;
+        int baseScore = activityData != null ? activityData.defaultBaseScore : 100;
+        int earned = baseScore + Mathf.RoundToInt(remainingTime * 10f);
+
+        if (isPerfect)
+            earned += bonus;
 
         Score += earned;
         onScoreChanged?.Invoke(Score, Combo);
@@ -82,12 +132,10 @@ public class JetSkiScoreManager : MonoBehaviour
             return;
         }
 
-        // 잔여 시간을 다음 게이트 카운터에 이월
         float nextBase = activityData != null ? activityData.defaultGateTime : 5.9f;
-        RemainingTime  = nextBase + remainingTime;
+        RemainingTime = nextBase + remainingTime;
     }
 
-    /// <summary>게이트를 놓쳤을 때 (콤보 리셋).</summary>
     public void GateMissed()
     {
         Combo = 0;
@@ -98,7 +146,7 @@ public class JetSkiScoreManager : MonoBehaviour
     {
         IsRunning = false;
         string rank = activityData != null ? activityData.GetRank(Score) : "None";
-        Debug.Log($"[ScoreManager] 종료 — 점수: {Score}, 랭크: {rank}");
+        Debug.Log($"[ScoreManager] Finished. Score: {Score}, Rank: {rank}");
         onGameOver?.Invoke(Score, rank);
     }
 }

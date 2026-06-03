@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,6 +19,7 @@ public class GateController : MonoBehaviour
     [Header("이벤트 (선택)")]
     public UnityEvent onPassed;
     public UnityEvent onPerfect;
+    public event Action<bool> GatePassedResult;
 
     public bool IsPassed { get; private set; }
 
@@ -66,6 +68,7 @@ public class GateController : MonoBehaviour
         scoreManager.GatePassed(scoreManager.RemainingTime, isPerfect);
 
         Debug.Log($"[Gate] {gameObject.name} 통과! 퍼펙트: {isPerfect}  점수: {scoreManager.Score}");
+        GatePassedResult?.Invoke(isPerfect);
         onPassed?.Invoke();
         if (isPerfect) onPerfect?.Invoke();
     }

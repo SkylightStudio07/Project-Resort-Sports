@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using StylizedWater2;
 using UnityEngine.XR;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody))]
 public class JetSkiController : MonoBehaviour
@@ -51,6 +52,9 @@ public class JetSkiController : MonoBehaviour
     [Header("Boost (optional)")]
     [Tooltip("같은 오브젝트에 붙은 JetSkiBoost. 비워두면 자동 탐색, 없어도 동작.")]
     public JetSkiBoost boost;
+
+    [Header("Events")]
+    public UnityEvent<float> onWaterLanding = new UnityEvent<float>();
 
     private Rigidbody rb;
     private float landingDampTimer;
@@ -123,7 +127,11 @@ public class JetSkiController : MonoBehaviour
         // 착지 감지: 공중 → 입수 + 빠른 하강 속도
         bool nowSubmerged = submergedCount > 0;
         if (!wasSubmerged && nowSubmerged && rb.velocity.y < -landingVelThreshold)
+        {
+            float impactSpeed = Mathf.Abs(rb.velocity.y);
             landingDampTimer = landingDampDuration;
+            onWaterLanding?.Invoke(impactSpeed);
+        }
         else
             landingDampTimer = Mathf.Max(0f, landingDampTimer - Time.fixedDeltaTime);
         wasSubmerged = nowSubmerged;

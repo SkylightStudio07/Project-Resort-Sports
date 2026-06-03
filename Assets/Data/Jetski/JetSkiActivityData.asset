@@ -13,6 +13,12 @@ MonoBehaviour:
   m_Name: JetSkiActivityData
   m_EditorClassIdentifier: 
   courseID: course_01
+  tutorialTitle: "HTC Vive \uC81C\uD2B8\uC2A4\uD0A4 \uC870\uC791 \uBC29\uBC95"
+  tutorialBody: "\uCEE8\uD2B8\uB864\uB7EC \uC785\uB825\uC73C\uB85C
+    \uC804\uC9C4\uD558\uACE0 \uC88C\uC6B0\uB85C \uC870\uD5A5\uD569\uB2C8\uB2E4.\n\uAC8C\uC774\uC9C0\uAC00
+    \uCC28\uBA74 \uC624\uB978\uC190 \uCEE8\uD2B8\uB864\uB7EC\uB97C \uBE44\uD2C0\uC5B4
+    \uBD80\uC2A4\uD2B8\uD558\uC138\uC694.\n\uAC8C\uC774\uD2B8\uB97C \uC21C\uC11C\uB300\uB85C
+    \uD1B5\uACFC\uD558\uC138\uC694."
   defaultGateTime: 5.9
   defaultBaseScore: 100
   defaultPerfectBonus: 50
