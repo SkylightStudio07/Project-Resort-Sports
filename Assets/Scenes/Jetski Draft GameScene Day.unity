@@ -6985,6 +6985,7 @@ GameObject:
   - component: {fileID: 2101797303}
   - component: {fileID: 2101797304}
   - component: {fileID: 2101797305}
+  - component: {fileID: 2101797306}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -7175,6 +7176,32 @@ MonoBehaviour:
   destroyAfterSeconds: 3
   minSecondsBetweenSpawns: 0.15
   replaceActiveEffect: 1
+--- !u!114 &2101797306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2101797299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c9ad1e55d4c4cd0975de13f92a8296f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jetSki: {fileID: 0}
+  jetSkiRigidbody: {fileID: 0}
+  scoreManager: {fileID: 1334255407}
+  recoverDuringGameOver: 1
+  flippedDotThreshold: 0.15
+  secondsBeforeRecovery: 1.2
+  recoveryHeightOffset: 0.6
+  disableControllerDuringRecovery: 1
+  fadeOutSeconds: 0.25
+  holdBlackSeconds: 0.1
+  fadeInSeconds: 0.35
+  fadeDistance: 0.55
+  fadeCanvasSize: {x: 2000, y: 2000}
+  fadeWorldScale: 0.001
 --- !u!1 &2125020464
 GameObject:
   m_ObjectHideFlags: 0

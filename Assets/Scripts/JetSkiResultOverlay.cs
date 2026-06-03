@@ -1,7 +1,9 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
 [AddComponentMenu("JetSki/Result Overlay")]
@@ -61,6 +63,7 @@ public class JetSkiResultOverlay : MonoBehaviour
     private bool built;
     private bool subscribed;
     private Coroutine retryTutorialCoroutine;
+    private float nextButtonActionTime;
 
     void Reset()
     {
@@ -408,6 +411,7 @@ public class JetSkiResultOverlay : MonoBehaviour
 
         var canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = GetTargetCamera();
         canvas.overrideSorting = true;
         canvas.sortingOrder = 5100;
 
@@ -458,7 +462,7 @@ public class JetSkiResultOverlay : MonoBehaviour
         CreateButton(panel.transform, "Hub Button", new Vector2(0.5f, 0f), new Vector2(1f, 0.22f), new Vector2(24f, 42f), new Vector2(-64f, -38f), "\uD5C8\uBE0C \uC6D4\uB4DC\uB85C", ReturnToHubWorld);
     }
 
-    private Button CreateButton(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, string label, UnityEngine.Events.UnityAction action)
+    private Button CreateButton(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, string label, UnityAction action)
     {
         var go = new GameObject(name);
         go.transform.SetParent(parent, false);
@@ -480,14 +484,46 @@ public class JetSkiResultOverlay : MonoBehaviour
         colors.pressedColor = buttonPressedColor;
         colors.selectedColor = new Color(0.9f, 1f, 1f, 1f);
         button.colors = colors;
-        button.onClick.AddListener(action);
+        button.onClick.AddListener(() => InvokeButtonAction(action));
 
         var text = CreateText(go.transform, "Text", 30, FontStyle.Bold, titleColor);
         text.text = label;
         text.alignment = TextAnchor.MiddleCenter;
         SetRect(text.rectTransform, Vector2.zero, Vector2.one, new Vector2(18f, 8f), new Vector2(-18f, -8f));
 
+        AddVrInteractableHitbox(go, CalculateStretchedRectSize(parent, anchorMin, anchorMax, offsetMin, offsetMax), action);
         return button;
+    }
+
+    private Vector2 CalculateStretchedRectSize(Transform parent, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
+    {
+        Vector2 parentSize = new Vector2(980f, 560f);
+        if (parent is RectTransform parentRect)
+            parentSize = parentRect.sizeDelta;
+
+        float width = parentSize.x * (anchorMax.x - anchorMin.x) + offsetMax.x - offsetMin.x;
+        float height = parentSize.y * (anchorMax.y - anchorMin.y) + offsetMax.y - offsetMin.y;
+        return new Vector2(Mathf.Max(1f, width), Mathf.Max(1f, height));
+    }
+
+    private void AddVrInteractableHitbox(GameObject buttonObject, Vector2 size, UnityAction action)
+    {
+        var collider = buttonObject.AddComponent<BoxCollider>();
+        collider.isTrigger = true;
+        collider.size = new Vector3(size.x, size.y, 24f);
+        collider.center = Vector3.zero;
+
+        var interactable = buttonObject.AddComponent<XRSimpleInteractable>();
+        interactable.selectEntered.AddListener(_ => InvokeButtonAction(action));
+    }
+
+    private void InvokeButtonAction(UnityAction action)
+    {
+        if (Time.unscaledTime < nextButtonActionTime)
+            return;
+
+        nextButtonActionTime = Time.unscaledTime + 0.25f;
+        action?.Invoke();
     }
 
     private Text CreateText(Transform parent, string name, int fontSize, FontStyle fontStyle, Color color)
@@ -525,9 +561,7 @@ public class JetSkiResultOverlay : MonoBehaviour
 
     private void FaceCamera()
     {
-        var targetCamera = Camera.main;
-        if (targetCamera == null)
-            targetCamera = FindAnyObjectByType<Camera>();
+        var targetCamera = GetTargetCamera();
 
         if (targetCamera == null)
             return;
@@ -537,6 +571,15 @@ public class JetSkiResultOverlay : MonoBehaviour
             return;
 
         canvasObject.transform.rotation = Quaternion.LookRotation(toCamera.normalized, Vector3.up);
+    }
+
+    private Camera GetTargetCamera()
+    {
+        var targetCamera = Camera.main;
+        if (targetCamera == null)
+            targetCamera = FindAnyObjectByType<Camera>();
+
+        return targetCamera;
     }
 
     private Sprite CreatePanelSprite(int width, int height, int radius)
