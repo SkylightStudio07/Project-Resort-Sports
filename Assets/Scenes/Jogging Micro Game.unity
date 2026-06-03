@@ -1076,7 +1076,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uD2B8\uB9AC\uAC70\uB97C \uB20C\uB7EC \uC870\uAE45 \uC2DC\uC791\n\uBA54\uB274\uB97C
+  m_Text: "\uD2B8\uB9AC\uAC70\uB97C \uB20C\uB7EC \uC870\uAE45 \uC2DC\uC791\n\uADF8\uB9BD\uB97C
     \uB20C\uB7EC \uC911\uB3C4 \uD3EC\uAE30"
 --- !u!222 &237911154
 CanvasRenderer:
@@ -9101,8 +9101,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3000000001}
-  m_LocalRotation: {x: 0.048686683, y: 0.90027356, z: -0.104408875, w: 0.41980466}
-  m_LocalPosition: {x: 0, y: 0, z: -51.85909}
+  m_LocalRotation: {x: 0.04916151, y: 0.90015495, z: -0.10542718, w: 0.4197492}
+  m_LocalPosition: {x: 0, y: 0, z: -51.871307}
   m_LocalScale: {x: 0.0065, y: 0.0065, z: 0.0065}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -9111,7 +9111,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -21.316322, y: 4.6379247}
+  m_AnchoredPosition: {x: -21.301767, y: 4.64958}
   m_SizeDelta: {x: 140, y: 52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &3000000003
