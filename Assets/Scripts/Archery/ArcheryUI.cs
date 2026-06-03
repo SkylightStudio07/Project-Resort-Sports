@@ -11,6 +11,7 @@ public class ArcheryUI : MonoBehaviour
     [Header("Final Score")]
     [SerializeField] private GameObject finalScorePanel;
     [SerializeField] private TextMeshProUGUI finalScoreText;
+    [SerializeField] private GameObject hudWindow;
 
     [Header("Settings")]
     [SerializeField] private ArcheryGameManager gameManager;
@@ -29,6 +30,8 @@ public class ArcheryUI : MonoBehaviour
         totalScoreText.text = $"Total    {gameManager.TotalScore}";
         if (finalScorePanel != null)
             finalScorePanel.SetActive(false);
+        if (hudWindow != null)
+            hudWindow.SetActive(true);
     }
 
     public void ShowFinalScore(int total)
@@ -36,6 +39,8 @@ public class ArcheryUI : MonoBehaviour
         if (finalScorePanel == null) return;
         if (finalScoreText != null)
             finalScoreText.text = $"Final Score    {total}";
+        if (hudWindow != null)
+            hudWindow.SetActive(false);
         finalScorePanel.SetActive(true);
     }
 }
