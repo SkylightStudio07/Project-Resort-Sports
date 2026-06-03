@@ -3013,7 +3013,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4253966930451744, guid: 67983a0d7ec8d4f6ab99828aa636a80f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 9.083273
+      value: 9.01424
       objectReference: {fileID: 0}
     - target: {fileID: 4253966930451744, guid: 67983a0d7ec8d4f6ab99828aa636a80f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -7070,8 +7070,11 @@ MonoBehaviour:
   bronzeResultClip: {fileID: 8300000, guid: 4bdebd00df3f31d468ab61601d6eaff8, type: 3}
   rankSfxVolume: 1
   enableGripHoldControls: 1
+  leftGripAction: {fileID: 6558622148059887818, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  rightGripAction: {fileID: -1758520528963094988, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   gripHoldSeconds: 1.2
-  gripAxisThreshold: 0.75
+  gripAxisThreshold: 0.6
+  scanInputSystemControls: 1
   panelColor: {r: 0.96, g: 0.99, b: 1, a: 0.9}
   panelBorderColor: {r: 1, g: 1, b: 1, a: 0.96}
   accentColor: {r: 0.15, g: 0.85, b: 1, a: 0.96}

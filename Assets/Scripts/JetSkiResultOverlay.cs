@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -49,8 +50,11 @@ public class JetSkiResultOverlay : MonoBehaviour
 
     [Header("Grip Hold Controls")]
     public bool enableGripHoldControls = true;
+    public InputActionReference leftGripAction;
+    public InputActionReference rightGripAction;
     public float gripHoldSeconds = 1.2f;
     [Range(0f, 1f)] public float gripAxisThreshold = 0.75f;
+    public bool scanInputSystemControls = true;
 
     [Header("Style")]
     public Color panelColor = new Color(0.96f, 0.99f, 1f, 0.9f);
@@ -75,6 +79,10 @@ public class JetSkiResultOverlay : MonoBehaviour
     private float nextButtonActionTime;
     private float retryGripHoldTime;
     private float hubGripHoldTime;
+    private InputAction generatedLeftGripButtonAction;
+    private InputAction generatedRightGripButtonAction;
+    private InputAction generatedLeftGripValueAction;
+    private InputAction generatedRightGripValueAction;
 
     void Reset()
     {
@@ -89,9 +97,20 @@ public class JetSkiResultOverlay : MonoBehaviour
         ResolveReferences();
     }
 
+    void OnEnable()
+    {
+        EnableGripActions();
+    }
+
+    void OnDisable()
+    {
+        DisableGeneratedGripActions();
+    }
+
     void Start()
     {
         ResolveReferences();
+        EnableGripActions();
         BuildIfNeeded();
         Subscribe();
         Hide();
@@ -594,8 +613,8 @@ public class JetSkiResultOverlay : MonoBehaviour
 
     private void UpdateGripHoldControls()
     {
-        bool leftGripHeld = ReadGrip(XRNode.LeftHand);
-        bool rightGripHeld = ReadGrip(XRNode.RightHand);
+        bool leftGripHeld = ReadGrip(XRNode.LeftHand, leftGripAction, generatedLeftGripButtonAction, generatedLeftGripValueAction);
+        bool rightGripHeld = ReadGrip(XRNode.RightHand, rightGripAction, generatedRightGripButtonAction, generatedRightGripValueAction);
 
 #if UNITY_EDITOR
         var keyboard = Keyboard.current;
@@ -628,9 +647,55 @@ public class JetSkiResultOverlay : MonoBehaviour
             InvokeButtonAction(action);
     }
 
-    private bool ReadGrip(XRNode node)
+    private bool ReadGrip(XRNode node, InputActionReference actionReference, InputAction generatedButtonAction, InputAction generatedValueAction)
     {
+        if (ReadGripAction(actionReference))
+            return true;
+
+        if (ReadGripAction(generatedButtonAction))
+            return true;
+
+        if (ReadGripAction(generatedValueAction))
+            return true;
+
         UnityEngine.XR.InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+        if (ReadLegacyXrGrip(device))
+            return true;
+
+        if (ReadLegacyXrGripByCharacteristics(node))
+            return true;
+
+        return scanInputSystemControls && ReadInputSystemGrip(node);
+    }
+
+    private bool ReadGripAction(InputActionReference actionReference)
+    {
+        return actionReference != null && ReadGripAction(actionReference.action);
+    }
+
+    private bool ReadGripAction(InputAction action)
+    {
+        if (action == null)
+            return false;
+
+        if (!action.enabled)
+            action.Enable();
+
+        if (action.IsPressed())
+            return true;
+
+        try
+        {
+            return action.ReadValue<float>() >= gripAxisThreshold;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool ReadLegacyXrGrip(UnityEngine.XR.InputDevice device)
+    {
         if (!device.isValid)
             return false;
 
@@ -641,6 +706,124 @@ public class JetSkiResultOverlay : MonoBehaviour
             return true;
 
         return false;
+    }
+
+    private bool ReadLegacyXrGripByCharacteristics(XRNode node)
+    {
+        var characteristics = InputDeviceCharacteristics.HeldInHand | InputDeviceCharacteristics.Controller;
+        characteristics |= node == XRNode.LeftHand ? InputDeviceCharacteristics.Left : InputDeviceCharacteristics.Right;
+
+        var devices = new System.Collections.Generic.List<UnityEngine.XR.InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(characteristics, devices);
+
+        foreach (var device in devices)
+        {
+            if (ReadLegacyXrGrip(device))
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool ReadInputSystemGrip(XRNode node)
+    {
+        var handUsage = node == XRNode.LeftHand ? UnityEngine.InputSystem.CommonUsages.LeftHand : UnityEngine.InputSystem.CommonUsages.RightHand;
+
+        foreach (var device in UnityEngine.InputSystem.InputSystem.devices)
+        {
+            if (device == null || !device.enabled || !HasInputSystemUsage(device, handUsage))
+                continue;
+
+            if (ReadInputSystemButton(device, "gripButton"))
+                return true;
+
+            if (ReadInputSystemButton(device, "gripPressed"))
+                return true;
+
+            if (ReadInputSystemButton(device, "grip"))
+                return true;
+
+            if (ReadInputSystemAxis(device, "grip"))
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool HasInputSystemUsage(UnityEngine.InputSystem.InputDevice device, UnityEngine.InputSystem.Utilities.InternedString usage)
+    {
+        foreach (var deviceUsage in device.usages)
+        {
+            if (deviceUsage == usage)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool ReadInputSystemButton(UnityEngine.InputSystem.InputDevice device, string controlName)
+    {
+        var button = device.TryGetChildControl<ButtonControl>(controlName);
+        return button != null && button.isPressed;
+    }
+
+    private bool ReadInputSystemAxis(UnityEngine.InputSystem.InputDevice device, string controlName)
+    {
+        var axis = device.TryGetChildControl<AxisControl>(controlName);
+        return axis != null && axis.ReadValue() >= gripAxisThreshold;
+    }
+
+    private void EnableGripActions()
+    {
+        EnsureGeneratedGripActions();
+
+        leftGripAction?.action?.Enable();
+        rightGripAction?.action?.Enable();
+        generatedLeftGripButtonAction?.Enable();
+        generatedRightGripButtonAction?.Enable();
+        generatedLeftGripValueAction?.Enable();
+        generatedRightGripValueAction?.Enable();
+    }
+
+    private void DisableGeneratedGripActions()
+    {
+        generatedLeftGripButtonAction?.Disable();
+        generatedRightGripButtonAction?.Disable();
+        generatedLeftGripValueAction?.Disable();
+        generatedRightGripValueAction?.Disable();
+    }
+
+    private void EnsureGeneratedGripActions()
+    {
+        if (generatedLeftGripButtonAction == null)
+            generatedLeftGripButtonAction = CreateGeneratedGripButtonAction("JetSki Result Left Grip Button", "LeftHand");
+
+        if (generatedRightGripButtonAction == null)
+            generatedRightGripButtonAction = CreateGeneratedGripButtonAction("JetSki Result Right Grip Button", "RightHand");
+
+        if (generatedLeftGripValueAction == null)
+            generatedLeftGripValueAction = CreateGeneratedGripValueAction("JetSki Result Left Grip Value", "LeftHand");
+
+        if (generatedRightGripValueAction == null)
+            generatedRightGripValueAction = CreateGeneratedGripValueAction("JetSki Result Right Grip Value", "RightHand");
+    }
+
+    private InputAction CreateGeneratedGripButtonAction(string name, string hand)
+    {
+        var action = new InputAction(name, InputActionType.Button);
+        action.AddBinding($"<XRController>{{{hand}}}/{{GripButton}}");
+        action.AddBinding($"<XRController>{{{hand}}}/gripButton");
+        action.AddBinding($"<XRController>{{{hand}}}/gripPressed");
+        action.AddBinding($"<XRController>{{{hand}}}/grip");
+        return action;
+    }
+
+    private InputAction CreateGeneratedGripValueAction(string name, string hand)
+    {
+        var action = new InputAction(name, InputActionType.Value);
+        action.AddBinding($"<XRController>{{{hand}}}/{{Grip}}");
+        action.AddBinding($"<XRController>{{{hand}}}/grip");
+        return action;
     }
 
     private void ResetGripHoldProgress()
