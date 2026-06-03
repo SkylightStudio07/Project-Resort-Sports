@@ -21,25 +21,34 @@ public class ArcheryUI : MonoBehaviour
     private void Awake()
     {
         canvas = GetComponent<Canvas>();
+        if (gameManager == null)
+            gameManager = FindObjectOfType<ArcheryGameManager>();
     }
 
     private void Start()
     {
-        if (finalScorePanel != null)
-            finalScorePanel.SetActive(false);
+        if (canvas != null) canvas.enabled = false;
+        if (finalScorePanel != null) finalScorePanel.SetActive(false);
+        if (hudWindow != null) hudWindow.SetActive(true);
+    }
+
+    public void ShowHUD()
+    {
+        if (canvas != null) canvas.enabled = true;
+        if (hudWindow != null) hudWindow.SetActive(true);
+        if (finalScorePanel != null) finalScorePanel.SetActive(false);
     }
 
     public void UpdateUI()
     {
+        if (gameManager == null) return;
         setText.text = $"Round    {gameManager.CurrentSet + 1} / {gameManager.TotalSets}";
         arrowScoreText.text = $"Score    {gameManager.LastArrowScore}";
         arrowScoreText.color = GetScoreColor(gameManager.LastArrowScore);
         arrowsText.text = $"Arrows    {gameManager.ArrowsLeft}";
         totalScoreText.text = $"Total    {gameManager.TotalScore}";
-        if (finalScorePanel != null)
-            finalScorePanel.SetActive(false);
-        if (hudWindow != null)
-            hudWindow.SetActive(true);
+        if (finalScorePanel != null) finalScorePanel.SetActive(false);
+        if (hudWindow != null) hudWindow.SetActive(true);
     }
 
     public void HideAll()

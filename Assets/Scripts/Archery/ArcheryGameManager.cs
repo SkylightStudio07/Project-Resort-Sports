@@ -43,6 +43,8 @@ public class ArcheryGameManager : MonoBehaviour
 
     private void Awake()
     {
+        if (ui == null)
+            ui = FindObjectOfType<ArcheryUI>();
         if (target != null)
             basePosition = target.position;
         else
@@ -79,6 +81,12 @@ public class ArcheryGameManager : MonoBehaviour
     }
 
     public void Restart() => StartGame();
+
+    public void ActivateHUD()
+    {
+        ui.ShowHUD();
+        ui.UpdateUI();
+    }
 
     public void StopGame()
     {

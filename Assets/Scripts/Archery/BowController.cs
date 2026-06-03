@@ -20,6 +20,9 @@ public class BowController : MonoBehaviour
     [Header("Charge Settings")]
     [SerializeField] private float maxChargeTime = 1.5f;
 
+    [Header("References")]
+    [SerializeField] private ArcheryGameManager gameManager;
+
     [Header("Haptic")]
     [SerializeField] private float maxHapticAmplitude = 0.6f;
 
@@ -53,6 +56,8 @@ public class BowController : MonoBehaviour
         grabInteractable = GetComponent<XRGrabInteractable>();
         arrowSpawner = GetComponent<ArrowSpawner>();
         mainCamera = Camera.main;
+        if (gameManager == null)
+            gameManager = FindObjectOfType<ArcheryGameManager>();
         spawnPosition = transform.position;
         spawnRotation = transform.rotation;
 
@@ -75,6 +80,7 @@ public class BowController : MonoBehaviour
         isHeld = true;
         rb.isKinematic = true;
         grabInteractable.enabled = false;
+        gameManager?.ActivateHUD();
     }
 
     private void Update()
@@ -135,7 +141,7 @@ public class BowController : MonoBehaviour
 
         if (isDrawing && pullAmount > 0f)
         {
-            // 현재 차징량으로 실제 발사력 계산 후 포물선 탄착점 예측
+            // ?�재 차징?�으�??�제 발사??계산 ???�물???�착???�측
             Vector3 pos = origin;
             Vector3 vel = direction * (pullAmount * arrowSpawner.MaxForce);
             const float timeStep = 0.02f;
@@ -158,7 +164,7 @@ public class BowController : MonoBehaviour
         }
         else
         {
-            // 조준 전: 직선 레이캐스트
+            // 조�? ?? 직선 ?�이캐스??
             hitPoint = Physics.Raycast(origin, direction, out RaycastHit rayHit, aimMaxDistance)
                 ? rayHit.point
                 : origin + direction * aimMaxDistance;
