@@ -15,6 +15,8 @@ public class ArrowSpawner : MonoBehaviour
 
     private GameObject currentArrow;
 
+    public float MaxForce => maxForce;
+
     public void SpawnArrow()
     {
         if (currentArrow != null)

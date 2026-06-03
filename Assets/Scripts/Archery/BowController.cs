@@ -127,10 +127,38 @@ public class BowController : MonoBehaviour
 
         Vector3 origin = nockingPoint.position;
         Vector3 direction = transform.right;
+        Vector3 hitPoint;
 
-        Vector3 hitPoint = Physics.Raycast(origin, direction, out RaycastHit hit, aimMaxDistance)
-            ? hit.point
-            : origin + direction * aimMaxDistance;
+        if (isDrawing && pullAmount > 0f)
+        {
+            // 현재 차징량으로 실제 발사력 계산 후 포물선 탄착점 예측
+            Vector3 pos = origin;
+            Vector3 vel = direction * (pullAmount * arrowSpawner.MaxForce);
+            const float timeStep = 0.02f;
+            hitPoint = origin + direction * aimMaxDistance;
+
+            for (int i = 0; i < 200; i++)
+            {
+                Vector3 nextPos = pos + vel * timeStep;
+                vel += Physics.gravity * timeStep;
+
+                if (Physics.Raycast(pos, nextPos - pos, out RaycastHit hit, Vector3.Distance(pos, nextPos)))
+                {
+                    hitPoint = hit.point;
+                    break;
+                }
+
+                pos = nextPos;
+                hitPoint = pos;
+            }
+        }
+        else
+        {
+            // 조준 전: 직선 레이캐스트
+            hitPoint = Physics.Raycast(origin, direction, out RaycastHit rayHit, aimMaxDistance)
+                ? rayHit.point
+                : origin + direction * aimMaxDistance;
+        }
 
         aimCrosshair.position = hitPoint;
         aimCrosshair.rotation = Quaternion.LookRotation(mainCamera.transform.position - hitPoint);
