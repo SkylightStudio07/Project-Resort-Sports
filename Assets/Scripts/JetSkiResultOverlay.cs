@@ -1,8 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
@@ -45,6 +47,11 @@ public class JetSkiResultOverlay : MonoBehaviour
     public AudioClip bronzeResultClip;
     public float rankSfxVolume = 1f;
 
+    [Header("Grip Hold Controls")]
+    public bool enableGripHoldControls = true;
+    public float gripHoldSeconds = 1.2f;
+    [Range(0f, 1f)] public float gripAxisThreshold = 0.75f;
+
     [Header("Style")]
     public Color panelColor = new Color(0.96f, 0.99f, 1f, 0.9f);
     public Color panelBorderColor = new Color(1f, 1f, 1f, 0.96f);
@@ -60,10 +67,14 @@ public class JetSkiResultOverlay : MonoBehaviour
     private Text titleText;
     private Text rankText;
     private Text scoreText;
+    private Image retryGripFill;
+    private Image hubGripFill;
     private bool built;
     private bool subscribed;
     private Coroutine retryTutorialCoroutine;
     private float nextButtonActionTime;
+    private float retryGripHoldTime;
+    private float hubGripHoldTime;
 
     void Reset()
     {
@@ -99,6 +110,9 @@ public class JetSkiResultOverlay : MonoBehaviour
 
         if (faceMainCamera && canvasObject != null && canvasObject.activeSelf)
             FaceCamera();
+
+        if (enableGripHoldControls && canvasObject != null && canvasObject.activeSelf)
+            UpdateGripHoldControls();
     }
 
     public void ShowResult(int finalScore, string rank)
@@ -118,6 +132,7 @@ public class JetSkiResultOverlay : MonoBehaviour
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
+        ResetGripHoldProgress();
 
         PlayRankSound(rank);
     }
@@ -133,6 +148,8 @@ public class JetSkiResultOverlay : MonoBehaviour
 
         if (canvasObject != null)
             canvasObject.SetActive(false);
+
+        ResetGripHoldProgress();
     }
 
     private void PlayRankSound(string rank)
@@ -205,6 +222,7 @@ public class JetSkiResultOverlay : MonoBehaviour
 
         if (sessionManager != null)
         {
+            Hide();
             sessionManager.ReturnToHubWorld();
             return;
         }
@@ -215,6 +233,7 @@ public class JetSkiResultOverlay : MonoBehaviour
             return;
         }
 
+        Hide();
         SceneManager.LoadScene(hubWorldSceneName);
     }
 
@@ -458,8 +477,54 @@ public class JetSkiResultOverlay : MonoBehaviour
         scoreText.alignment = TextAnchor.MiddleCenter;
         SetRect(scoreText.rectTransform, new Vector2(0f, 0.24f), new Vector2(1f, 0.44f), new Vector2(70f, -4f), new Vector2(-70f, 6f));
 
-        CreateButton(panel.transform, "Retry Button", new Vector2(0f, 0f), new Vector2(0.5f, 0.22f), new Vector2(64f, 42f), new Vector2(-24f, -38f), "\uB2E4\uC2DC\uD558\uAE30", Retry);
-        CreateButton(panel.transform, "Hub Button", new Vector2(0.5f, 0f), new Vector2(1f, 0.22f), new Vector2(24f, 42f), new Vector2(-64f, -38f), "\uD5C8\uBE0C \uC6D4\uB4DC\uB85C", ReturnToHubWorld);
+        CreateButton(panel.transform, "Retry Button", new Vector2(0f, 0.05f), new Vector2(0.5f, 0.26f), new Vector2(64f, 36f), new Vector2(-24f, -36f), "\uB2E4\uC2DC\uD558\uAE30", Retry);
+        CreateButton(panel.transform, "Hub Button", new Vector2(0.5f, 0.05f), new Vector2(1f, 0.26f), new Vector2(24f, 36f), new Vector2(-64f, -36f), "\uD5C8\uBE0C \uC6D4\uB4DC\uB85C", ReturnToHubWorld);
+
+        retryGripFill = CreateGripHoldPrompt(panel.transform, "Retry Grip Hold", new Vector2(0f, 0f), new Vector2(0.5f, 0.08f), new Vector2(64f, 8f), new Vector2(-24f, 2f), "\uC67C\uC190 GRIP \uAE38\uAC8C \uB204\uB974\uAE30");
+        hubGripFill = CreateGripHoldPrompt(panel.transform, "Hub Grip Hold", new Vector2(0.5f, 0f), new Vector2(1f, 0.08f), new Vector2(24f, 8f), new Vector2(-64f, 2f), "\uC624\uB978\uC190 GRIP \uAE38\uAC8C \uB204\uB974\uAE30");
+    }
+
+    private Image CreateGripHoldPrompt(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, string label)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+
+        var rect = go.AddComponent<RectTransform>();
+        SetRect(rect, anchorMin, anchorMax, offsetMin, offsetMax);
+
+        var text = CreateText(go.transform, "Text", 20, FontStyle.Bold, titleColor);
+        text.text = label;
+        text.alignment = TextAnchor.MiddleCenter;
+        SetRect(text.rectTransform, new Vector2(0f, 0.34f), Vector2.one, Vector2.zero, Vector2.zero);
+
+        var bar = new GameObject("Gauge");
+        bar.transform.SetParent(go.transform, false);
+
+        var barRect = bar.AddComponent<RectTransform>();
+        SetRect(barRect, new Vector2(0.12f, 0.04f), new Vector2(0.88f, 0.28f), Vector2.zero, Vector2.zero);
+
+        var background = bar.AddComponent<Image>();
+        background.sprite = CreateButtonSprite(256, 40, 12);
+        background.type = Image.Type.Sliced;
+        background.color = new Color(1f, 1f, 1f, 0.42f);
+        background.raycastTarget = false;
+
+        var fillObject = new GameObject("Fill");
+        fillObject.transform.SetParent(bar.transform, false);
+
+        var fillRect = fillObject.AddComponent<RectTransform>();
+        SetRect(fillRect, Vector2.zero, Vector2.one, new Vector2(4f, 4f), new Vector2(-4f, -4f));
+
+        var fill = fillObject.AddComponent<Image>();
+        fill.sprite = CreateButtonSprite(256, 32, 10);
+        fill.type = Image.Type.Filled;
+        fill.fillMethod = Image.FillMethod.Horizontal;
+        fill.fillOrigin = 0;
+        fill.fillAmount = 0f;
+        fill.color = accentColor;
+        fill.raycastTarget = false;
+
+        return fill;
     }
 
     private Button CreateButton(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax, string label, UnityAction action)
@@ -523,7 +588,71 @@ public class JetSkiResultOverlay : MonoBehaviour
             return;
 
         nextButtonActionTime = Time.unscaledTime + 0.25f;
+        ResetGripHoldProgress();
         action?.Invoke();
+    }
+
+    private void UpdateGripHoldControls()
+    {
+        bool leftGripHeld = ReadGrip(XRNode.LeftHand);
+        bool rightGripHeld = ReadGrip(XRNode.RightHand);
+
+#if UNITY_EDITOR
+        var keyboard = Keyboard.current;
+        if (keyboard != null)
+        {
+            leftGripHeld |= keyboard.qKey.isPressed;
+            rightGripHeld |= keyboard.eKey.isPressed;
+        }
+#endif
+
+        UpdateGripHold(ref retryGripHoldTime, leftGripHeld, retryGripFill, Retry);
+        UpdateGripHold(ref hubGripHoldTime, rightGripHeld, hubGripFill, ReturnToHubWorld);
+    }
+
+    private void UpdateGripHold(ref float holdTime, bool isHeld, Image fillImage, UnityAction action)
+    {
+        if (gripHoldSeconds <= 0f)
+        {
+            InvokeButtonAction(action);
+            return;
+        }
+
+        holdTime = isHeld ? holdTime + Time.unscaledDeltaTime : 0f;
+        float fill = Mathf.Clamp01(holdTime / gripHoldSeconds);
+
+        if (fillImage != null)
+            fillImage.fillAmount = fill;
+
+        if (fill >= 1f)
+            InvokeButtonAction(action);
+    }
+
+    private bool ReadGrip(XRNode node)
+    {
+        UnityEngine.XR.InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+        if (!device.isValid)
+            return false;
+
+        if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.gripButton, out bool gripPressed) && gripPressed)
+            return true;
+
+        if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.grip, out float gripValue) && gripValue >= gripAxisThreshold)
+            return true;
+
+        return false;
+    }
+
+    private void ResetGripHoldProgress()
+    {
+        retryGripHoldTime = 0f;
+        hubGripHoldTime = 0f;
+
+        if (retryGripFill != null)
+            retryGripFill.fillAmount = 0f;
+
+        if (hubGripFill != null)
+            hubGripFill.fillAmount = 0f;
     }
 
     private Text CreateText(Transform parent, string name, int fontSize, FontStyle fontStyle, Color color)

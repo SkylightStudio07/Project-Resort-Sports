@@ -3013,7 +3013,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4253966930451744, guid: 67983a0d7ec8d4f6ab99828aa636a80f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 9.205763
+      value: 9.083273
       objectReference: {fileID: 0}
     - target: {fileID: 4253966930451744, guid: 67983a0d7ec8d4f6ab99828aa636a80f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3074,7 +3074,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1272377526}
   seatOffset: {x: 0, y: 0, z: 0.3}
-  vrHeightOffset: 0.2
+  vrHeightOffset: 0.3
   followYaw: 1
   positionLerpSpeed: 24
 --- !u!1 &790751356
@@ -7069,6 +7069,9 @@ MonoBehaviour:
   silverResultClip: {fileID: 8300000, guid: 2fe7d91ebc9b4f643b90089047ef3a58, type: 3}
   bronzeResultClip: {fileID: 8300000, guid: 4bdebd00df3f31d468ab61601d6eaff8, type: 3}
   rankSfxVolume: 1
+  enableGripHoldControls: 1
+  gripHoldSeconds: 1.2
+  gripAxisThreshold: 0.75
   panelColor: {r: 0.96, g: 0.99, b: 1, a: 0.9}
   panelBorderColor: {r: 1, g: 1, b: 1, a: 0.96}
   accentColor: {r: 0.15, g: 0.85, b: 1, a: 0.96}
