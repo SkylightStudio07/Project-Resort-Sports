@@ -1,8 +1,15 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class JetSkiBoost : MonoBehaviour
 {
+    [Header("Events")]
+    [Tooltip("부스트 발동 순간 1회 호출. HUD/이펙트/햅틱 트리거용.")]
+    public UnityEvent OnBoostActivated;
+    [Tooltip("게이지가 막 풀로 찬 순간 1회 호출.")]
+    public UnityEvent OnGaugeFull;
+
     [Header("Gauge")]
     [Tooltip("게이지가 0에서 1까지 차는 데 걸리는 시간(초). 풀스로틀 기준.")]
     public float secondsToFull = 5f;
@@ -67,9 +74,11 @@ public class JetSkiBoost : MonoBehaviour
         // 2) 게이지 충전 (부스트 중에는 충전 금지)
         if (!IsBoosting && secondsToFull > 0f)
         {
+            float prev = Gauge;
             float throttle = ReadThrottle01();
             float rate = fillByThrottle.Evaluate(throttle) / secondsToFull;
             Gauge = Mathf.Clamp01(Gauge + rate * dt);
+            if (prev < 1f && Gauge >= 1f) OnGaugeFull?.Invoke();
         }
 
         // 3) 트위스트 제스처 (게이지 풀 + 비부스트 상태에서만 검출)
@@ -130,5 +139,6 @@ public class JetSkiBoost : MonoBehaviour
         boostTimeRemaining = boostDuration;
         Gauge = 0f;
         ResetWindow();
+        OnBoostActivated?.Invoke();
     }
 }
