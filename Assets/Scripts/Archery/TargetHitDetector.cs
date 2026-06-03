@@ -11,6 +11,11 @@ public class TargetHitDetector : MonoBehaviour
     [Range(0.05f, 0.4f)]
     private float bullseyeRatio = 0.15f;
 
+    [Header("Hit Sound")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip greatClip;
+    [SerializeField] private AudioClip perfectClip;
+
     public void RegisterHit(Vector3 hitWorldPos)
     {
         Vector3 localHit = transform.InverseTransformPoint(hitWorldPos);
@@ -23,8 +28,19 @@ public class TargetHitDetector : MonoBehaviour
         if (score > 0)
         {
             gameManager.AddScore(score);
+            PlayHitSound(score);
             Debug.Log($"Hit! +{score}");
         }
+    }
+
+    private void PlayHitSound(int score)
+    {
+        if (audioSource == null) return;
+
+        if (score == 10 && perfectClip != null)
+            audioSource.PlayOneShot(perfectClip);
+        else if (score >= 8 && greatClip != null)
+            audioSource.PlayOneShot(greatClip);
     }
 
     private int CalculateScore(float ratio)
