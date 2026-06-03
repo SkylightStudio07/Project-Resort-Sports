@@ -22,6 +22,8 @@ namespace ResortSports.Jogging
         public Transform lookTarget;
         public Transform followTarget;
         public Vector3 followLocalOffset = new Vector3(0f, -0.25f, 1.25f);
+        [Range(0.5f, 30f)] public float followSharpness = 8f;
+        [Range(0.5f, 30f)] public float rotationSharpness = 12f;
 
         [Header("Display")]
         public SpeedUnit unit = SpeedUnit.Both;
@@ -32,6 +34,7 @@ namespace ResortSports.Jogging
         public bool visibleOnlyWhileRunning = true;
 
         private float _shownSpeed;
+        private bool _hasFollowPose;
 
         private void Awake()
         {
@@ -57,7 +60,17 @@ namespace ResortSports.Jogging
         private void UpdateFollowPosition()
         {
             if (followTarget == null) return;
-            transform.position = followTarget.TransformPoint(followLocalOffset);
+
+            Vector3 targetPosition = followTarget.TransformPoint(followLocalOffset);
+            if (!_hasFollowPose)
+            {
+                transform.position = targetPosition;
+                _hasFollowPose = true;
+                return;
+            }
+
+            float a = 1f - Mathf.Exp(-Time.deltaTime * followSharpness);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, a);
         }
 
         private void UpdateBillboard()
@@ -70,7 +83,9 @@ namespace ResortSports.Jogging
             Vector3 dir = transform.position - t.position;
             if (lockYAxis) dir.y = 0f;
             if (dir.sqrMagnitude < 1e-4f) return;
-            transform.rotation = Quaternion.LookRotation(dir.normalized, Vector3.up);
+            Quaternion targetRotation = Quaternion.LookRotation(dir.normalized, Vector3.up);
+            float a = 1f - Mathf.Exp(-Time.deltaTime * rotationSharpness);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, a);
         }
 
         private void UpdateText()
