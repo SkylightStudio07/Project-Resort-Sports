@@ -70,6 +70,7 @@ public class JetSkiCourseStarter : MonoBehaviour
             return;
         }
         if (ignoreIfRunning && scoreManager.IsRunning) return;
+        if (scoreManager.IsGameOver) return;
 
         CollectGatesIfEmpty();
         ResetAllGates();

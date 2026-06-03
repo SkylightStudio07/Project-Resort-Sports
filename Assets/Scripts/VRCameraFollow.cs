@@ -16,6 +16,9 @@ public class VRCameraFollow : MonoBehaviour
     [Tooltip("제트스키 로컬 기준 좌석 오프셋 (앞뒤/높이/좌우)")]
     public Vector3 seatOffset = new Vector3(0f, 0.5f, 0.3f);
 
+    [Tooltip("실기기 VR에서 카메라가 낮게 느껴질 때 추가로 올리는 월드 Y 오프셋.")]
+    public float vrHeightOffset = 0.2f;
+
     [Tooltip("제트스키의 Yaw(좌우 회전)를 XR Origin에 반영할지 여부.\n" +
              "true: 제트스키가 돌면 컨트롤러 '앞' 방향도 같이 돔(직관적).\n" +
              "false: 항상 월드 기준으로 고개를 돌려야 함.")]
@@ -52,6 +55,7 @@ public class VRCameraFollow : MonoBehaviour
 
         // 목표 위치: 제트스키의 로컬 seatOffset을 월드 좌표로 변환
         Vector3 targetPos = target.TransformPoint(seatOffset);
+        targetPos += Vector3.up * vrHeightOffset;
 
         // 위치 추적 (LerpSpeed == 0이면 즉시)
         if (positionLerpSpeed > 0f)

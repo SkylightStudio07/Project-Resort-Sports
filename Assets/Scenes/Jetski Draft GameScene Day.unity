@@ -3074,6 +3074,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 1272377526}
   seatOffset: {x: 0, y: 0, z: 0.3}
+  vrHeightOffset: 0.2
   followYaw: 1
   positionLerpSpeed: 24
 --- !u!1 &790751356

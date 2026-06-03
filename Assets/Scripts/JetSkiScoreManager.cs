@@ -25,6 +25,7 @@ public class JetSkiScoreManager : MonoBehaviour
     public int Combo { get; private set; }
     public float RemainingTime { get; private set; }
     public bool IsRunning { get; private set; }
+    public bool IsGameOver { get; private set; }
 
     private int totalGates;
     private int passedGates;
@@ -60,6 +61,7 @@ public class JetSkiScoreManager : MonoBehaviour
         Score = 0;
         Combo = 0;
         IsRunning = true;
+        IsGameOver = false;
         RemainingTime = activityData != null ? activityData.defaultGateTime : 5.9f;
     }
 
@@ -72,6 +74,7 @@ public class JetSkiScoreManager : MonoBehaviour
         Score = 0;
         Combo = 0;
         IsRunning = false;
+        IsGameOver = false;
         RemainingTime = activityData != null ? activityData.defaultGateTime : 5.9f;
 
         onScoreChanged?.Invoke(Score, Combo);
@@ -145,6 +148,7 @@ public class JetSkiScoreManager : MonoBehaviour
     void EndGame()
     {
         IsRunning = false;
+        IsGameOver = true;
         string rank = activityData != null ? activityData.GetRank(Score) : "None";
         Debug.Log($"[ScoreManager] Finished. Score: {Score}, Rank: {rank}");
         onGameOver?.Invoke(Score, rank);

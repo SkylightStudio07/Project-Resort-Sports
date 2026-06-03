@@ -48,6 +48,9 @@ public class GateController : MonoBehaviour
             return;
         }
 
+        if (scoreManager.IsGameOver)
+            return;
+
         // 코스가 안 시작됐으면 자동 시작
         if (!scoreManager.IsRunning)
         {
@@ -56,6 +59,9 @@ public class GateController : MonoBehaviour
             if (starter != null) starter.StartCourse();
             else scoreManager.StartCourse(1); // 스타터 없으면 임시로 1개짜리 코스
         }
+
+        if (!scoreManager.IsRunning)
+            return;
 
         float lateralOffset = Vector3.Dot(other.transform.position - transform.position, transform.right);
         float normalized    = Mathf.Abs(lateralOffset) / (gateWidth * 0.5f);
