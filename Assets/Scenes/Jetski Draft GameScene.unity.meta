@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scenes/Jogging Micro Game.unity.meta
+guid: 3f603a17c0bb178429749d79fd692ee2
+========
 guid: d95f6334df5e9314cbfd06aad3305c54
+>>>>>>>> develop:Assets/Scenes/Jetski Draft GameScene.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

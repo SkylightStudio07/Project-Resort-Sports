@@ -1,5 +1,10 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts.meta
+guid: ae909930c9901df4fb0f36a78af11a6d
+folderAsset: yes
+========
 guid: cffeb3cb432ebb346912663adcc2ef9d
+>>>>>>>> develop:Assets/Asset/Jetski/material.mtl.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
