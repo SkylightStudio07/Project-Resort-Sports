@@ -1,30 +1,47 @@
 using System.Collections;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
-/// Strike / Spare / Gutter 알림 UI입니다.
+/// Strike / Spare / Gutter 알림 UI입니다 (이미지 방식).
 /// 레인 중앙 상단 World Space Canvas에 배치합니다.
-/// 텍스트가 크게 나타났다가 페이드 아웃됩니다.
+/// 스프라이트가 확대되며 등장(오버슈트)했다가 페이드 아웃됩니다.
 ///
 /// [Unity 씬 설정]
 /// 1. 레인 위에 빈 오브젝트 생성 → Canvas (World Space) 추가
-/// 2. 캔버스 아래 TextMeshProUGUI 하나 배치
+/// 2. 캔버스 아래 Image 하나 배치 (알림 이미지가 표시될 곳)
 /// 3. 캔버스에 CanvasGroup 컴포넌트 추가
-/// 4. 이 스크립트 부착 후 슬롯 연결
+/// 4. 이 스크립트 부착 후 슬롯 + 스프라이트 3개 연결
 /// </summary>
 public class NotificationUI : MonoBehaviour
 {
     [Header("UI 컴포넌트")]
-    public TextMeshProUGUI notificationText;
-    public CanvasGroup     canvasGroup;
+    public Image       notificationImage;
+    public CanvasGroup canvasGroup;
+
+    [Header("알림 스프라이트")]
+    public Sprite strikeSprite;
+    public Sprite spareSprite;
+    public Sprite gutterSprite;
 
     [Header("연출 설정")]
-    [Tooltip("텍스트가 표시되는 시간 (초)")]
+    [Tooltip("이미지가 표시되는 시간 (초)")]
     public float displayDuration = 2f;
 
-    [Tooltip("페이드 인/아웃 시간 (초)")]
-    public float fadeDuration    = 0.3f;
+    [Tooltip("등장(확대) 시간 (초)")]
+    public float popInDuration = 0.25f;
+
+    [Tooltip("오버슈트 후 정상 크기로 돌아오는 시간 (초)")]
+    public float settleDuration = 0.12f;
+
+    [Tooltip("페이드 아웃 시간 (초)")]
+    public float fadeOutDuration = 0.3f;
+
+    [Tooltip("등장 시작 크기 배율")]
+    public float startScale = 0.3f;
+
+    [Tooltip("오버슈트 최대 크기 배율")]
+    public float overshootScale = 1.15f;
 
     [Header("볼링 이벤트 참조")]
     public ScoreManager scoreManager;
@@ -37,9 +54,9 @@ public class NotificationUI : MonoBehaviour
 
     private void Start()
     {
-        scoreManager.OnStrike    += () => ShowNotification("STRIKE!", new Color(1f, 0.85f, 0f));
-        scoreManager.OnSpare     += () => ShowNotification("SPARE!",  new Color(0.4f, 0.9f, 1f));
-        ballManager.OnGutterBall += () => ShowNotification("GUTTER",  new Color(1f, 0.4f, 0.4f));
+        scoreManager.OnStrike    += HandleStrike;
+        scoreManager.OnSpare     += HandleSpare;
+        ballManager.OnGutterBall += HandleGutter;
 
         canvasGroup.alpha = 0f;
     }
@@ -48,63 +65,71 @@ public class NotificationUI : MonoBehaviour
     {
         if (scoreManager != null)
         {
-            scoreManager.OnStrike -= () => ShowNotification("STRIKE!", Color.yellow);
-            scoreManager.OnSpare  -= () => ShowNotification("SPARE!",  Color.cyan);
+            scoreManager.OnStrike -= HandleStrike;
+            scoreManager.OnSpare  -= HandleSpare;
         }
         if (ballManager != null)
-            ballManager.OnGutterBall -= () => ShowNotification("GUTTER", Color.red);
+            ballManager.OnGutterBall -= HandleGutter;
     }
+
+    // ── 이벤트 핸들러 ────────────────────────────────────────────────────
+
+    private void HandleStrike() => ShowNotification(strikeSprite);
+    private void HandleSpare()  => ShowNotification(spareSprite);
+    private void HandleGutter() => ShowNotification(gutterSprite);
 
     // ── 알림 표시 ────────────────────────────────────────────────────────
 
-    public void ShowNotification(string message, Color color)
+    public void ShowNotification(Sprite sprite)
     {
+        if (sprite == null) return;
+
         if (_currentCoroutine != null)
             StopCoroutine(_currentCoroutine);
 
-        notificationText.text  = message;
-        notificationText.color = color;
-
+        notificationImage.sprite = sprite;
         _currentCoroutine = StartCoroutine(PlayNotification());
     }
 
     private IEnumerator PlayNotification()
     {
-        // 페이드 인 + 스케일 펀치
+        // ── 등장: startScale → overshootScale (확대) ────────────────────
         float t = 0f;
-        transform.localScale = Vector3.one * 0.5f;
+        transform.localScale = Vector3.one * startScale;
+        canvasGroup.alpha    = 0f;
 
-        while (t < fadeDuration)
+        while (t < popInDuration)
         {
             t += Time.deltaTime;
-            float progress      = t / fadeDuration;
-            canvasGroup.alpha   = progress;
-            transform.localScale = Vector3.one * Mathf.Lerp(0.5f, 1.1f, progress);
+            float p              = t / popInDuration;
+            // EaseOut 곡선 (빠르게 커졌다 느려짐)
+            float eased          = 1f - Mathf.Pow(1f - p, 3f);
+            canvasGroup.alpha    = p;
+            transform.localScale = Vector3.one * Mathf.Lerp(startScale, overshootScale, eased);
             yield return null;
         }
 
-        // 스케일 살짝 줄이기 (탄력감)
+        // ── 정착: overshootScale → 1.0 (탄력감) ─────────────────────────
         t = 0f;
-        float punchDuration = 0.1f;
-        while (t < punchDuration)
+        while (t < settleDuration)
         {
             t += Time.deltaTime;
-            transform.localScale = Vector3.one * Mathf.Lerp(1.1f, 1f, t / punchDuration);
+            transform.localScale = Vector3.one * Mathf.Lerp(overshootScale, 1f, t / settleDuration);
             yield return null;
         }
 
         canvasGroup.alpha    = 1f;
         transform.localScale = Vector3.one;
 
-        // 표시 유지
+        // ── 유지 ────────────────────────────────────────────────────────
         yield return new WaitForSeconds(displayDuration);
 
-        // 페이드 아웃
+        // ── 퇴장: 페이드 아웃 ───────────────────────────────────────────
         t = 0f;
-        while (t < fadeDuration)
+        while (t < fadeOutDuration)
         {
             t += Time.deltaTime;
-            canvasGroup.alpha = 1f - (t / fadeDuration);
+            canvasGroup.alpha = 1f - (t / fadeOutDuration);
             yield return null;
         }
 
