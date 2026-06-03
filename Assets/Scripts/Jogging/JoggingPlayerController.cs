@@ -31,6 +31,8 @@ namespace ResortSports.Jogging
         [Header("Orientation")]
         [Tooltip("XR Origin의 forward를 트랙 진행 방향으로 자동 회전")]
         public bool faceTrackDirection = true;
+        [Tooltip("XR Origin forward가 트랙 진행 방향과 반대로 보일 때 켭니다.")]
+        public bool invertTrackDirection = false;
         [Tooltip("자동 회전 속도 (deg/s). 0이면 즉시.")]
         public float turnSpeed = 180f;
 
@@ -98,6 +100,7 @@ namespace ResortSports.Jogging
             if (faceTrackDirection)
             {
                 Vector3 dir = track.GetDirectionAtDistance(_distance);
+                if (invertTrackDirection) dir = -dir;
                 dir.y = 0f;
                 if (dir.sqrMagnitude > 1e-4f)
                 {

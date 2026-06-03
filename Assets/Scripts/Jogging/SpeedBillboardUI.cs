@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ResortSports.Jogging
 {
@@ -15,8 +16,12 @@ namespace ResortSports.Jogging
         [Header("References")]
         public JoggingPlayerController player;
         public TMP_Text speedText;
+        public Text legacySpeedText;
+        public Canvas targetCanvas;
         [Tooltip("바라볼 대상 (보통 메인 카메라). 비워두면 Camera.main 사용.")]
         public Transform lookTarget;
+        public Transform followTarget;
+        public Vector3 followLocalOffset = new Vector3(0f, -0.25f, 1.25f);
 
         [Header("Display")]
         public SpeedUnit unit = SpeedUnit.Both;
@@ -24,13 +29,35 @@ namespace ResortSports.Jogging
         [Range(0f, 0.5f)] public float displaySmoothing = 0.1f;
         [Tooltip("Y축만 회전 (수평 빌보드)")]
         public bool lockYAxis = true;
+        public bool visibleOnlyWhileRunning = true;
 
         private float _shownSpeed;
 
+        private void Awake()
+        {
+            if (targetCanvas == null) targetCanvas = GetComponent<Canvas>();
+        }
+
         private void LateUpdate()
         {
+            UpdateVisibility();
+            UpdateFollowPosition();
             UpdateBillboard();
             UpdateText();
+        }
+
+        private void UpdateVisibility()
+        {
+            bool visible = !visibleOnlyWhileRunning || (player != null && player.IsRunning);
+            if (targetCanvas != null) targetCanvas.enabled = visible;
+            if (speedText != null) speedText.enabled = visible;
+            if (legacySpeedText != null) legacySpeedText.enabled = visible;
+        }
+
+        private void UpdateFollowPosition()
+        {
+            if (followTarget == null) return;
+            transform.position = followTarget.TransformPoint(followLocalOffset);
         }
 
         private void UpdateBillboard()
@@ -48,7 +75,7 @@ namespace ResortSports.Jogging
 
         private void UpdateText()
         {
-            if (speedText == null || player == null) return;
+            if (player == null || (speedText == null && legacySpeedText == null)) return;
 
             float dt = Mathf.Max(Time.deltaTime, 1e-4f);
             float a = displaySmoothing <= 0f ? 1f : 1f - Mathf.Exp(-dt / displaySmoothing);
@@ -57,15 +84,21 @@ namespace ResortSports.Jogging
             switch (unit)
             {
                 case SpeedUnit.MetersPerSecond:
-                    speedText.text = $"{_shownSpeed:0.0} m/s";
+                    SetText($"{_shownSpeed:0.0} m/s");
                     break;
                 case SpeedUnit.KilometersPerHour:
-                    speedText.text = $"{_shownSpeed * 3.6f:0.0} km/h";
+                    SetText($"{_shownSpeed * 3.6f:0.0} km/h");
                     break;
                 case SpeedUnit.Both:
-                    speedText.text = $"{_shownSpeed * 3.6f:0.0} km/h\n<size=60%>{_shownSpeed:0.00} m/s</size>";
+                    SetText($"{_shownSpeed * 3.6f:0.0} km/h\n{_shownSpeed:0.00} m/s");
                     break;
             }
+        }
+
+        private void SetText(string text)
+        {
+            if (speedText != null) speedText.text = text;
+            if (legacySpeedText != null) legacySpeedText.text = text;
         }
     }
 }

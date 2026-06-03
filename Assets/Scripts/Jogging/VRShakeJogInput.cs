@@ -29,9 +29,18 @@ namespace ResortSports.Jogging
         [Tooltip("양손 모두 흔들 때 가산 보너스 (0~1)")]
         [Range(0f, 1f)] public float bothHandsBonus = 0.25f;
 
+        [Header("Footstep SFX")]
+        public JoggingPlayerController player;
+        public AudioSource footstepAudioSource;
+        public AudioClip[] footstepClips;
+        [Range(0f, 1f)] public float footstepIntensityThreshold = 0.25f;
+        [Range(0.05f, 1f)] public float footstepMinInterval = 0.28f;
+        [Range(0f, 1f)] public float footstepVolume = 0.8f;
+
         private Vector3 _prevLeftLocal, _prevRightLocal;
         private float _smoothedIntensity;
         private bool _initialized;
+        private float _nextFootstepTime;
 
         /// <summary>현재 정규화 흔들기 강도 (0~1+).</summary>
         public float Intensity => _smoothedIntensity;
@@ -71,9 +80,24 @@ namespace ResortSports.Jogging
             // 1차 저역통과
             float a = 1f - Mathf.Exp(-dt / Mathf.Max(0.01f, smoothing));
             _smoothedIntensity = Mathf.Lerp(_smoothedIntensity, combined, a);
+            TryPlayFootstepSfx();
 
             _prevLeftLocal = lLocal;
             _prevRightLocal = rLocal;
+        }
+
+        private void TryPlayFootstepSfx()
+        {
+            if (player != null && !player.IsRunning) return;
+            if (footstepAudioSource == null || footstepClips == null || footstepClips.Length == 0) return;
+
+            if (_smoothedIntensity < footstepIntensityThreshold || Time.time < _nextFootstepTime) return;
+
+            AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
+            if (clip == null) return;
+
+            footstepAudioSource.PlayOneShot(clip, footstepVolume);
+            _nextFootstepTime = Time.time + footstepMinInterval;
         }
     }
 }

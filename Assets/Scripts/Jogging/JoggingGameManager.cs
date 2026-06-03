@@ -135,7 +135,7 @@ namespace ResortSports.Jogging
             if (IsStartPressed()) BeginRun();
         }
 
-        private bool IsPlayerNearStart()
+        public bool IsPlayerNearStart()
         {
             if (player == null || player.XrOrigin == null || track == null) return false;
 
