@@ -5,9 +5,8 @@ public class ArcheryGameManager : MonoBehaviour
     [System.Serializable]
     public class SetConfig
     {
-        // Set 1은 (0, 0) 고정. Set 2~5는 Set 1 기준 X/Z 오프셋
+        // Set 1은 0 고정. Set 2~5는 Set 1 기준 -X 오프셋 (음수 입력)
         public float offsetX;
-        public float offsetZ;
         public bool patrol;
         public float patrolDistance = 3f;
         public float patrolSpeed = 1.5f;
@@ -132,7 +131,7 @@ public class ArcheryGameManager : MonoBehaviour
             target.position = new Vector3(
                 basePosition.x + config.offsetX,
                 basePosition.y,
-                basePosition.z + config.offsetZ
+                basePosition.z
             );
             target.gameObject.SetActive(true);
         }
